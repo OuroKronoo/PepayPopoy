@@ -1,396 +1,6434 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Popoy &amp; Pepay Reviewer</title>
-<style>
-  :root{
-    --bg:#0f1220; --bg2:#171a2e; --card:#1e2140; --card2:#262a4d;
-    --text:#eef0ff; --muted:#a2a7cc; --line:#2f3560;
-    --brand:#7c5cff; --brand2:#5cc8ff; --good:#3ddc97; --bad:#ff6b81;
-    --shadow:0 10px 30px rgba(0,0,0,.35);
-  }
-  @media (prefers-color-scheme: light){
-    :root{
-      --bg:#f4f5fb; --bg2:#ffffff; --card:#ffffff; --card2:#f0f1fa;
-      --text:#1a1c33; --muted:#5a5f80; --line:#e3e5f2;
-      --shadow:0 10px 30px rgba(60,60,120,.12);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popoy &amp; Pepay Reviewer</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --bg2: #171a2e;
+      --card: #1e2140;
+      --card2: #262a4d;
+      --text: #eef0ff;
+      --muted: #a2a7cc;
+      --line: #2f3560;
+      --brand: #7c5cff;
+      --brand2: #5cc8ff;
+      --good: #3ddc97;
+      --bad: #ff6b81;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
     }
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1200px 700px at 80% -10%, rgba(124,92,255,.18), transparent 60%),
-               radial-gradient(1000px 600px at -10% 110%, rgba(92,200,255,.15), transparent 60%),
-               var(--bg);
-    color:var(--text); min-height:100vh; line-height:1.5;
-  }
-  .wrap{max-width:860px;margin:0 auto;padding:24px 16px 70px}
 
-  header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.5px}
-  .logo .mark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-size:19px;box-shadow:var(--shadow)}
-  .tag{color:var(--muted);font-size:13px;font-weight:500}
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f4f5fb;
+        --bg2: #ffffff;
+        --card: #ffffff;
+        --card2: #f0f1fa;
+        --text: #1a1c33;
+        --muted: #5a5f80;
+        --line: #e3e5f2;
+        --shadow: 0 10px 30px rgba(60, 60, 120, .12);
+      }
+    }
 
-  button{font-family:inherit;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-  .btn{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:12px;
-    padding:10px 16px;cursor:pointer;transition:.15s;font-weight:700}
-  .btn:hover{border-color:var(--brand);transform:translateY(-1px)}
-  .btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));border:none;color:#fff}
-  .btn.ghost{background:transparent}
+    * {
+      box-sizing: border-box
+    }
 
-  /* Profile picker */
-  .profilebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;
-    background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
-  .pblabel{font-size:13px;font-weight:800;color:var(--muted)}
-  .profile{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;
-    border:2px solid var(--line);background:var(--card);cursor:pointer;transition:.15s;color:var(--text);font-weight:800;font-size:15px}
-  .profile:hover{transform:translateY(-1px)}
-  .profile .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:19px;color:#fff}
-  .profile[data-user="popoy"] .av{background:linear-gradient(135deg,#7c5cff,#5cc8ff)}
-  .profile[data-user="pepay"] .av{background:linear-gradient(135deg,#ff5c9d,#ffab5c)}
-  .profile[data-user="popoy"].active{border-color:#7c5cff;box-shadow:0 0 0 3px rgba(124,92,255,.18)}
-  .profile[data-user="pepay"].active{border-color:#ff5c9d;box-shadow:0 0 0 3px rgba(255,92,157,.18)}
+    html,
+    body {
+      margin: 0;
+      padding: 0
+    }
 
-  /* Subject grid */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-  .subject{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;
-    cursor:pointer;transition:.15s;box-shadow:var(--shadow);text-align:left;color:var(--text)}
-  .subject:hover{transform:translateY(-3px);border-color:var(--brand)}
-  .subject .ico{font-size:30px}
-  .subject h3{margin:8px 0 2px;font-size:17px}
-  .subject .meta{font-size:12px;color:var(--muted);font-weight:600}
-  .subject .best{margin-top:8px;font-size:12px;font-weight:800;display:inline-block;
-    padding:3px 10px;border-radius:999px;background:var(--card2);color:var(--muted)}
-  .subject .best.gold{background:rgba(61,220,151,.15);color:var(--good)}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 80% -10%, rgba(124, 92, 255, .18), transparent 60%),
+        radial-gradient(1000px 600px at -10% 110%, rgba(92, 200, 255, .15), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
 
-  /* Setup card */
-  .box{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
-  h2{margin:0 0 6px;font-size:20px}
-  .hint{color:var(--muted);font-size:13px;margin:0 0 14px}
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);
-    cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);transition:.15s}
-  .chip.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 16px 70px
+    }
 
-  /* Quiz */
-  .progress{width:100%;height:8px;background:var(--card);border-radius:999px;overflow:hidden;border:1px solid var(--line);margin-bottom:10px}
-  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));width:0;transition:.3s}
-  .counter{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;font-weight:700;margin-bottom:14px}
-  .question{font-size:19px;font-weight:700;margin-bottom:18px;white-space:pre-wrap}
-  .opts{display:flex;flex-direction:column;gap:10px}
-  .opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:var(--card);
-    border:2px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s;
-    color:var(--text);font-size:15px;font-weight:600;line-height:1.45}
-  .opt:hover:not(:disabled){border-color:var(--brand);transform:translateX(3px)}
-  .opt .key{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
-    background:var(--card2);font-weight:800;font-size:13px;color:var(--muted)}
-  .opt:disabled{cursor:default;opacity:.75}
-  .opt.correct{border-color:var(--good);background:rgba(61,220,151,.12);opacity:1}
-  .opt.correct .key{background:var(--good);color:#fff}
-  .opt.wrong{border-color:var(--bad);background:rgba(255,107,129,.12);opacity:1}
-  .opt.wrong .key{background:var(--bad);color:#fff}
-  .feedback{margin-top:14px;font-weight:800;font-size:15px;display:none}
-  .feedback.good{display:block;color:var(--good)}
-  .feedback.bad{display:block;color:var(--bad)}
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap
+    }
 
-  /* Results */
-  .scorebig{font-size:52px;font-weight:800;text-align:center;margin:6px 0}
-  .scoremsg{text-align:center;color:var(--muted);font-weight:600;margin-bottom:18px}
-  .missed{margin-top:20px}
-  .miss{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;font-size:14px}
-  .miss .q{font-weight:700;margin-bottom:6px}
-  .miss .yours{color:var(--bad);font-weight:600}
-  .miss .right{color:var(--good);font-weight:600}
-  .center{text-align:center}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -.5px
+    }
 
-  .screen{display:none;animation:fade .25s ease}
-  .screen.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .logo .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: #fff;
+      font-size: 19px;
+      box-shadow: var(--shadow)
+    }
 
-  .crumb{background:none;border:none;color:var(--muted);font-weight:700;cursor:pointer;padding:0;margin-bottom:14px;font-size:14px}
-  .crumb:hover{color:var(--text)}
-  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:34px}
-  .err{background:rgba(255,107,129,.12);border:1px solid var(--bad);border-radius:12px;padding:16px;font-weight:600}
+    .tag {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500
+    }
 
-  /* Touch devices: no hover-shift effects (they stick after a tap) */
-  @media (hover:none){
-    .btn:hover,.profile:hover,.subject:hover{transform:none}
-    .opt:hover:not(:disabled){border-color:var(--line);transform:none}
-  }
-  /* Phone layout */
-  @media (max-width:520px){
-    .wrap{padding:14px 12px 56px}
-    .logo{font-size:19px}
-    .logo .mark{width:32px;height:32px;font-size:16px}
-    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-    .subject{padding:14px 12px}
-    .subject .ico{font-size:26px}
-    .subject h3{font-size:15px}
-    .box{padding:16px 14px;border-radius:16px}
-    .question{font-size:17px}
-    .opt{padding:13px 12px;font-size:14px}
-    .scorebig{font-size:44px}
-    .profilebar{padding:10px}
-    .profile{font-size:14px;padding:7px 13px 7px 7px}
-    .profile .av{width:32px;height:32px;font-size:17px}
-  }
-</style>
+    button {
+      font-family: inherit;
+      font-size: 14px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    .btn {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: .15s;
+      font-weight: 700
+    }
+
+    .btn:hover {
+      border-color: var(--brand);
+      transform: translateY(-1px)
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      border: none;
+      color: #fff
+    }
+
+    .btn.ghost {
+      background: transparent
+    }
+
+    /* Profile picker */
+    .profilebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow)
+    }
+
+    .pblabel {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted)
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px 8px 8px;
+      border-radius: 999px;
+      border: 2px solid var(--line);
+      background: var(--card);
+      cursor: pointer;
+      transition: .15s;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 15px
+    }
+
+    .profile:hover {
+      transform: translateY(-1px)
+    }
+
+    .profile .av {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      color: #fff
+    }
+
+    .profile[data-user="popoy"] .av {
+      background: linear-gradient(135deg, #7c5cff, #5cc8ff)
+    }
+
+    .profile[data-user="pepay"] .av {
+      background: linear-gradient(135deg, #ff5c9d, #ffab5c)
+    }
+
+    .profile[data-user="popoy"].active {
+      border-color: #7c5cff;
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, .18)
+    }
+
+    .profile[data-user="pepay"].active {
+      border-color: #ff5c9d;
+      box-shadow: 0 0 0 3px rgba(255, 92, 157, .18)
+    }
+
+    /* Subject grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px
+    }
+
+    .subject {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      cursor: pointer;
+      transition: .15s;
+      box-shadow: var(--shadow);
+      text-align: left;
+      color: var(--text)
+    }
+
+    .subject:hover {
+      transform: translateY(-3px);
+      border-color: var(--brand)
+    }
+
+    .subject .ico {
+      font-size: 30px
+    }
+
+    .subject h3 {
+      margin: 8px 0 2px;
+      font-size: 17px
+    }
+
+    .subject .meta {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600
+    }
+
+    .subject .best {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--card2);
+      color: var(--muted)
+    }
+
+    .subject .best.gold {
+      background: rgba(61, 220, 151, .15);
+      color: var(--good)
+    }
+
+    /* Setup card */
+    .box {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow)
+    }
+
+    h2 {
+      margin: 0 0 6px;
+      font-size: 20px
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 14px
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .chip {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      transition: .15s
+    }
+
+    .chip.active {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: #fff;
+      border-color: transparent
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 16px
+    }
+
+    /* Quiz */
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: var(--card);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      margin-bottom: 10px
+    }
+
+    .progress>i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      width: 0;
+      transition: .3s
+    }
+
+    .counter {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 14px
+    }
+
+    .question {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      white-space: pre-wrap
+    }
+
+    .opts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: .15s;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.45
+    }
+
+    .opt:hover:not(:disabled) {
+      border-color: var(--brand);
+      transform: translateX(3px)
+    }
+
+    .opt .key {
+      flex: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--card2);
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .opt:disabled {
+      cursor: default;
+      opacity: .75
+    }
+
+    .opt.correct {
+      border-color: var(--good);
+      background: rgba(61, 220, 151, .12);
+      opacity: 1
+    }
+
+    .opt.correct .key {
+      background: var(--good);
+      color: #fff
+    }
+
+    .opt.wrong {
+      border-color: var(--bad);
+      background: rgba(255, 107, 129, .12);
+      opacity: 1
+    }
+
+    .opt.wrong .key {
+      background: var(--bad);
+      color: #fff
+    }
+
+    .feedback {
+      margin-top: 14px;
+      font-weight: 800;
+      font-size: 15px;
+      display: none
+    }
+
+    .feedback.good {
+      display: block;
+      color: var(--good)
+    }
+
+    .feedback.bad {
+      display: block;
+      color: var(--bad)
+    }
+
+    /* Results */
+    .scorebig {
+      font-size: 52px;
+      font-weight: 800;
+      text-align: center;
+      margin: 6px 0
+    }
+
+    .scoremsg {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 18px
+    }
+
+    .missed {
+      margin-top: 20px
+    }
+
+    .miss {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      font-size: 14px
+    }
+
+    .miss .q {
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .miss .yours {
+      color: var(--bad);
+      font-weight: 600
+    }
+
+    .miss .right {
+      color: var(--good);
+      font-weight: 600
+    }
+
+    .center {
+      text-align: center
+    }
+
+    .screen {
+      display: none;
+      animation: fade .25s ease
+    }
+
+    .screen.active {
+      display: block
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .crumb {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 14px;
+      font-size: 14px
+    }
+
+    .crumb:hover {
+      color: var(--text)
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 34px
+    }
+
+    .err {
+      background: rgba(255, 107, 129, .12);
+      border: 1px solid var(--bad);
+      border-radius: 12px;
+      padding: 16px;
+      font-weight: 600
+    }
+
+    /* Touch devices: no hover-shift effects (they stick after a tap) */
+    @media (hover:none) {
+
+      .btn:hover,
+      .profile:hover,
+      .subject:hover {
+        transform: none
+      }
+
+      .opt:hover:not(:disabled) {
+        border-color: var(--line);
+        transform: none
+      }
+    }
+
+    /* Phone layout */
+    @media (max-width:520px) {
+      .wrap {
+        padding: 14px 12px 56px
+      }
+
+      .logo {
+        font-size: 19px
+      }
+
+      .logo .mark {
+        width: 32px;
+        height: 32px;
+        font-size: 16px
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px
+      }
+
+      .subject {
+        padding: 14px 12px
+      }
+
+      .subject .ico {
+        font-size: 26px
+      }
+
+      .subject h3 {
+        font-size: 15px
+      }
+
+      .box {
+        padding: 16px 14px;
+        border-radius: 16px
+      }
+
+      .question {
+        font-size: 17px
+      }
+
+      .opt {
+        padding: 13px 12px;
+        font-size: 14px
+      }
+
+      .scorebig {
+        font-size: 44px
+      }
+
+      .profilebar {
+        padding: 10px
+      }
+
+      .profile {
+        font-size: 14px;
+        padding: 7px 13px 7px 7px
+      }
+
+      .profile .av {
+        width: 32px;
+        height: 32px;
+        font-size: 17px
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="wrap">
+  <div class="wrap">
 
-  <header>
-    <div class="logo">
-      <span class="mark">✦</span>
-      <div>Popoy &amp; Pepay Reviewer
-        <div class="tag">Multiple-choice practice tests · 8 subjects · 400 questions</div>
+    <header>
+      <div class="logo">
+        <span class="mark">✦</span>
+        <div>Popoy &amp; Pepay Reviewer
+          <div class="tag">Multiple-choice practice tests</div>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <div class="profilebar">
-    <span class="pblabel">Who's reviewing?</span>
-    <button class="profile" data-user="popoy"><span class="av">👦</span>Popoy</button>
-    <button class="profile" data-user="pepay"><span class="av">👧</span>Pepay</button>
+    <div class="profilebar">
+      <span class="pblabel">Who's reviewing?</span>
+      <button class="profile" data-user="popoy"><span class="av">👦</span>Popoy</button>
+      <button class="profile" data-user="pepay"><span class="av">👧</span>Pepay</button>
+    </div>
+
+    <!-- HOME: subject picker -->
+    <section class="screen active" id="scr-home">
+      <div class="grid" id="subjectGrid"></div>
+    </section>
+
+    <!-- SETUP: choose test length -->
+    <section class="screen" id="scr-setup">
+      <button class="crumb" onclick="go('home')">← All subjects</button>
+      <div class="box">
+        <h2 id="setupTitle"></h2>
+        <p class="hint" id="setupHint"></p>
+        <div class="chips" id="lenChips">
+          <span class="chip" data-len="10">Quick 10</span>
+          <span class="chip" data-len="25">Half 25</span>
+          <span class="chip active" data-len="50">Full 50</span>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="startBtn">▶ Start test</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="screen" id="scr-quiz">
+      <button class="crumb" id="quitBtn">✕ Quit test</button>
+      <div class="box">
+        <div class="progress"><i id="pbar"></i></div>
+        <div class="counter"><span id="qCounter"></span><span id="qScore"></span></div>
+        <div class="question" id="qText"></div>
+        <div class="opts" id="qOpts"></div>
+        <div class="feedback" id="qFeed"></div>
+        <div class="row" style="justify-content:flex-end">
+          <button class="btn primary" id="nextBtn" style="visibility:hidden">Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="screen" id="scr-result">
+      <div class="box">
+        <div class="center" style="font-size:44px" id="resEmoji"></div>
+        <div class="scorebig" id="resScore"></div>
+        <div class="scoremsg" id="resMsg"></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn primary" id="retryBtn">↻ Try again</button>
+          <button class="btn" onclick="go('home')">🏠 All subjects</button>
+        </div>
+        <div class="missed" id="missedList"></div>
+      </div>
+    </section>
+
+    <footer id="foot"></footer>
   </div>
 
-  <!-- HOME: subject picker -->
-  <section class="screen active" id="scr-home">
-    <div class="grid" id="subjectGrid"></div>
-  </section>
-
-  <!-- SETUP: choose test length -->
-  <section class="screen" id="scr-setup">
-    <button class="crumb" onclick="go('home')">← All subjects</button>
-    <div class="box">
-      <h2 id="setupTitle"></h2>
-      <p class="hint" id="setupHint"></p>
-      <div class="chips" id="lenChips">
-        <span class="chip" data-len="10">Quick 10</span>
-        <span class="chip" data-len="25">Half 25</span>
-        <span class="chip active" data-len="50">Full 50</span>
-      </div>
-      <div class="row">
-        <button class="btn primary" id="startBtn">▶ Start test</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- QUIZ -->
-  <section class="screen" id="scr-quiz">
-    <button class="crumb" id="quitBtn">✕ Quit test</button>
-    <div class="box">
-      <div class="progress"><i id="pbar"></i></div>
-      <div class="counter"><span id="qCounter"></span><span id="qScore"></span></div>
-      <div class="question" id="qText"></div>
-      <div class="opts" id="qOpts"></div>
-      <div class="feedback" id="qFeed"></div>
-      <div class="row" style="justify-content:flex-end">
-        <button class="btn primary" id="nextBtn" style="visibility:hidden">Next →</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- RESULTS -->
-  <section class="screen" id="scr-result">
-    <div class="box">
-      <div class="center" style="font-size:44px" id="resEmoji"></div>
-      <div class="scorebig" id="resScore"></div>
-      <div class="scoremsg" id="resMsg"></div>
-      <div class="row" style="justify-content:center">
-        <button class="btn primary" id="retryBtn">↻ Try again</button>
-        <button class="btn" onclick="go('home')">🏠 All subjects</button>
-      </div>
-      <div class="missed" id="missedList"></div>
-    </div>
-  </section>
-
-  <footer id="foot"></footer>
-</div>
-
-<script src="questions.js"></script>
-<script>
-(function(){
-  "use strict";
-  const $=s=>document.querySelector(s);
-  const $$=s=>Array.from(document.querySelectorAll(s));
-  const STORE="reviewr.mc.v1";
-  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-
-  if(typeof QUESTION_BANK==="undefined"){
-    document.querySelector(".wrap").insertAdjacentHTML("beforeend",
-      '<div class="err">questions.js is missing — keep it in the same folder as this page.</div>');
-    return;
-  }
-
-  /* ---------- state ---------- */
-  let st=load();
-  function load(){
-    try{ const raw=JSON.parse(localStorage.getItem(STORE)); if(raw&&raw.users) return raw; }catch(e){}
-    return {currentUser:"popoy", users:{popoy:{best:{}}, pepay:{best:{}}}};
-  }
-  function save(){ localStorage.setItem(STORE, JSON.stringify(st)); }
-  const me=()=>st.users[st.currentUser];
-
-  /* ---------- profiles ---------- */
-  function renderProfiles(){
-    $$(".profile").forEach(p=>p.classList.toggle("active",p.dataset.user===st.currentUser));
-    const s=document.documentElement.style;
-    if(st.currentUser==="pepay"){ s.setProperty("--brand","#ff5c9d"); s.setProperty("--brand2","#ffab5c"); }
-    else { s.setProperty("--brand","#7c5cff"); s.setProperty("--brand2","#5cc8ff"); }
-    $("#foot").textContent="Reviewing as "+cap(st.currentUser)+" · scores are saved on this device";
-  }
-  $$(".profile").forEach(p=>p.onclick=()=>{
-    st.currentUser=p.dataset.user; save(); renderProfiles(); renderHome();
-  });
-
-  /* ---------- screens ---------- */
-  window.go=function(name){
-    $$(".screen").forEach(x=>x.classList.remove("active"));
-    $("#scr-"+name).classList.add("active");
-    if(name==="home") renderHome();
-  };
-
-  /* ---------- home ---------- */
-  function renderHome(){
-    const g=$("#subjectGrid"); g.innerHTML="";
-    QUESTION_BANK.forEach((sub,i)=>{
-      const b=me().best[sub.name];
-      const el=document.createElement("button"); el.className="subject";
-      el.innerHTML=`<div class="ico">${sub.icon}</div><h3></h3>
-        <div class="meta">${sub.questions.length} items</div>
-        <div class="best ${b&&b.pct>=80?'gold':''}">${b?`Best: ${b.score}/${b.total} (${b.pct}%)`:"Not taken yet"}</div>`;
-      el.querySelector("h3").textContent=sub.name;
-      el.onclick=()=>openSetup(i);
-      g.appendChild(el);
-    });
-  }
-
-  /* ---------- setup ---------- */
-  let subIdx=0, testLen=50;
-  function openSetup(i){
-    subIdx=i;
-    const sub=QUESTION_BANK[i];
-    $("#setupTitle").textContent=sub.icon+" "+sub.name;
-    const b=me().best[sub.name];
-    $("#setupHint").textContent=(b?`${cap(st.currentUser)}'s best: ${b.score}/${b.total} (${b.pct}%). `:"")+
-      "Questions are shuffled every attempt. Answer with the buttons or keys A–D / 1–4.";
-    go("setup");
-  }
-  $$("#lenChips .chip").forEach(c=>c.onclick=()=>{
-    $$("#lenChips .chip").forEach(x=>x.classList.remove("active"));
-    c.classList.add("active"); testLen=parseInt(c.dataset.len,10);
-  });
-  $("#startBtn").onclick=startTest;
-
-  /* ---------- quiz ---------- */
-  let order=[], qi=0, score=0, missed=[], answered=false;
-  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
-  function startTest(){
-    const sub=QUESTION_BANK[subIdx];
-    order=shuffle(sub.questions.map((_,i)=>i)).slice(0,Math.min(testLen,sub.questions.length));
-    qi=0; score=0; missed=[];
-    go("quiz"); drawQ();
-  }
-
-  function drawQ(){
-    const sub=QUESTION_BANK[subIdx];
-    const q=sub.questions[order[qi]];
-    answered=false;
-    $("#pbar").style.width=Math.round(qi/order.length*100)+"%";
-    $("#qCounter").textContent=`${sub.icon} ${sub.name} · Question ${qi+1} of ${order.length}`;
-    $("#qScore").textContent=`Score: ${score}`;
-    $("#qText").textContent=q.q;
-    $("#qFeed").className="feedback";
-    $("#nextBtn").style.visibility="hidden";
-    const box=$("#qOpts"); box.innerHTML="";
-    q.choices.forEach((c,i)=>{
-      const b=document.createElement("button"); b.className="opt";
-      const k=document.createElement("span"); k.className="key"; k.textContent="ABCD"[i];
-      b.append(k,document.createTextNode(" "+c));
-      b.onclick=()=>pick(i,b);
-      box.appendChild(b);
-    });
-  }
-
-  function pick(i,btn){
-    if(answered) return;
-    answered=true;
-    const sub=QUESTION_BANK[subIdx];
-    const q=sub.questions[order[qi]];
-    const opts=$$("#qOpts .opt");
-    opts.forEach(o=>o.disabled=true);
-    opts[q.correct].classList.add("correct");
-    if(i===q.correct){
-      score++;
-      $("#qScore").textContent=`Score: ${score}`;
-      $("#qFeed").className="feedback good"; $("#qFeed").textContent="✓ Correct!";
-    } else {
-      btn.classList.add("wrong");
-      $("#qFeed").className="feedback bad";
-      $("#qFeed").textContent="✗ The correct answer is "+"ABCD"[q.correct]+".";
-      missed.push({q:q.q, yours:q.choices[i], right:q.choices[q.correct]});
+  <script>
+    // Question banks per reviewer (different grade levels).
+    // Popoy: popoy1.xlsx (Math), popoy2.xlsx (MAPEH), popoy3.xlsx (TLE)
+    // Pepay: ESP_Topic1_50_Items.xlsx + Remaining_7_Subjects_50_Items.xlsx
+    const QUESTION_BANKS = {
+ "popoy": [
+  {
+   "name": "Math",
+   "icon": "➗",
+   "questions": [
+    {
+     "q": "What is the product of 12 and 15?",
+     "choices": [
+      "150",
+      "180",
+      "200",
+      "160"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "In multiplying polynomials using the vertical method, what is the first step?",
+     "choices": [
+      "Divide the coefficients",
+      "Add the exponents immediately",
+      "Align the similar terms vertically",
+      "Change the signs of the second row"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Multiply 3x^2 by 4x.",
+     "choices": [
+      "12x^3",
+      "12x^2",
+      "7x^2",
+      "7x^3"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Find the product of (x + 2) and (x + 3).",
+     "choices": [
+      "x^2 + x + 6",
+      "x^2 + 6x + 5",
+      "x^2 + 5x + 6",
+      "2x + 5"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the product of 25 and 14?",
+     "choices": [
+      "350",
+      "360",
+      "250",
+      "340"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "According to the product law of exponents, what is x^m * x^n?",
+     "choices": [
+      "x^(m/n)",
+      "x^(m-n)",
+      "x^(m*n)",
+      "x^(m+n)"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Simplify: a^3 * a^4.",
+     "choices": [
+      "a^7",
+      "a^1",
+      "2a^7",
+      "a^12"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the product of 2x^2 and 3x^5?",
+     "choices": [
+      "5x^10",
+      "5x^7",
+      "6x^10",
+      "6x^7"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Simplify: y * y^6.",
+     "choices": [
+      "y^6",
+      "y^8",
+      "2y^6",
+      "y^7"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following demonstrates the product law of exponents?",
+     "choices": [
+      "b^2 * b^3 = b^6",
+      "b^2 * b^3 = b^5",
+      "(b^2)^3 = b^6",
+      "b^5 / b^3 = b^2"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "A mathematical phrase that can contain ordinary numbers, variables, and operators is called an ___.",
+     "choices": [
+      "Inequality",
+      "Equation",
+      "Algebraic Expression",
+      "Exponent"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "A symbol, usually a letter, used to represent an unknown number is called a ___.",
+     "choices": [
+      "Constant",
+      "Coefficient",
+      "Term",
+      "Variable"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "A fixed value that does not change is called a ___.",
+     "choices": [
+      "Variable",
+      "Constant",
+      "Exponent",
+      "Base"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "The number written in front of a variable is known as the ___.",
+     "choices": [
+      "Power",
+      "Numerical Coefficient",
+      "Constant",
+      "Literal Coefficient"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Terms whose variables and their exponents are exactly the same are called ___.",
+     "choices": [
+      "Dissimilar terms",
+      "Constants",
+      "Binomials",
+      "Similar terms"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the numerical coefficient in the term -5xy^2?",
+     "choices": [
+      "x",
+      "-5",
+      "5",
+      "y^2"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Identify the numerical coefficient of the term x.",
+     "choices": [
+      "None",
+      "0",
+      "1",
+      "x"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "In the expression 4a^2 - 7b + 3, what is the numerical coefficient of b?",
+     "choices": [
+      "4",
+      "3",
+      "7",
+      "-7"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the numerical coefficient of -yz?",
+     "choices": [
+      "1",
+      "0",
+      "-y",
+      "-1"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Give the numerical coefficient of 12m^3n.",
+     "choices": [
+      "12",
+      "n",
+      "3",
+      "m"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Add: (2x + 3) + (4x + 1).",
+     "choices": [
+      "6x + 3",
+      "6x + 4",
+      "8x^2 + 3",
+      "8x + 4"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Find the sum of (5y^2 - 2y) and (y^2 + 4y).",
+     "choices": [
+      "6y^2 - 6y",
+      "6y^2 + 2y",
+      "5y^2 + 2y",
+      "4y^2 + 6y"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the sum of 3a + 5b and -2a - 3b?",
+     "choices": [
+      "-a - 2b",
+      "a - 2b",
+      "a + 2b",
+      "5a + 8b"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Add the polynomials: (x^2 + 2x + 1) and (2x^2 - x - 3).",
+     "choices": [
+      "3x^2 + x - 2",
+      "3x^2 + 3x - 2",
+      "3x^2 - x + 2",
+      "2x^2 + x - 4"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "When adding polynomials, which terms can be combined?",
+     "choices": [
+      "Constant terms only",
+      "Variables with different exponents",
+      "Similar terms",
+      "All terms"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following is a monomial?",
+     "choices": [
+      "x^2 - y^2",
+      "a + b + c",
+      "x + 1",
+      "3x^2"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "An algebraic expression consisting of exactly two terms is a ___.",
+     "choices": [
+      "Binomial",
+      "Trinomial",
+      "Monomial",
+      "Multinomial"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "The expression x^2 + 5x + 6 is an example of a ___.",
+     "choices": [
+      "Equation",
+      "Monomial",
+      "Trinomial",
+      "Binomial"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What type of polynomial is 4x^3 - 2x + 1?",
+     "choices": [
+      "Multinomial",
+      "Monomial",
+      "Trinomial",
+      "Binomial"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "An expression with four or more terms is generally called a ___.",
+     "choices": [
+      "Binomial",
+      "Multinomial",
+      "Trinomial",
+      "Monomial"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following pairs are similar terms?",
+     "choices": [
+      "3x^2 and 3x",
+      "2x and -5x",
+      "x and y",
+      "4ab and 4a"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Identify the constant in the expression 3x^2 - 4x + 9.",
+     "choices": [
+      "x",
+      "9",
+      "-4",
+      "3"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following represents the variables in the term 7xy?",
+     "choices": [
+      "x and y",
+      "7x",
+      "7",
+      "7y"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of these is NOT a polynomial?",
+     "choices": [
+      "5",
+      "x + y + z",
+      "3x^2 - 1",
+      "4/x + 2"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Classify the polynomial: 10xyz.",
+     "choices": [
+      "Multinomial",
+      "Monomial",
+      "Binomial",
+      "Trinomial"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What separates the terms in an algebraic expression?",
+     "choices": [
+      "Division signs",
+      "Equal signs",
+      "Multiplication signs",
+      "Plus or minus signs"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "How many terms are in the expression 3x^2 - 5x + 2?",
+     "choices": [
+      "One",
+      "Three",
+      "Four",
+      "Two"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following is considered a single algebraic term?",
+     "choices": [
+      "8a^2b",
+      "a - b",
+      "2x + 1",
+      "x^2 + y^2"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "An algebraic expression must NOT contain which of the following?",
+     "choices": [
+      "An exponent",
+      "An equal sign",
+      "A variable",
+      "A constant"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "The term 5x^3 is composed of a numerical coefficient and a ___.",
+     "choices": [
+      "Literal coefficient",
+      "Constant",
+      "Divisor",
+      "Radical"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the mean of the numbers 2, 4, 6, 8, 10?",
+     "choices": [
+      "5",
+      "8",
+      "30",
+      "6"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "How is the mean calculated?",
+     "choices": [
+      "The most frequent value",
+      "The middle value in an ordered set",
+      "Sum of all values divided by the number of values",
+      "The difference between the highest and lowest value"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the median of the set: 3, 1, 4, 2, 5?",
+     "choices": [
+      "4",
+      "1",
+      "5",
+      "3"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "If a data set has an even number of values, how do you find the median?",
+     "choices": [
+      "Pick the highest of the two middle numbers",
+      "Pick the lowest of the two middle numbers",
+      "Average the two middle numbers",
+      "It has no median"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Find the median of 10, 20, 30, 40.",
+     "choices": [
+      "100",
+      "30",
+      "20",
+      "25"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the mode of the following numbers: 2, 3, 3, 4, 5?",
+     "choices": [
+      "3",
+      "4",
+      "5",
+      "2"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "A data set that has two modes is called ___.",
+     "choices": [
+      "Unimodal",
+      "Multimodal",
+      "Amodal",
+      "Bimodal"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the mode of 7, 8, 9, 10?",
+     "choices": [
+      "No mode",
+      "8.5",
+      "10",
+      "7"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which measure of central tendency represents the most frequently occurring value?",
+     "choices": [
+      "Mode",
+      "Median",
+      "Range",
+      "Mean"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Calculate the mean of 5, 5, 5, 5, 5.",
+     "choices": [
+      "1",
+      "25",
+      "0",
+      "5"
+     ],
+     "correct": 3
     }
-    $("#nextBtn").style.visibility="visible";
-    $("#nextBtn").textContent = qi===order.length-1 ? "See results →" : "Next →";
-    $("#nextBtn").focus();
-  }
-
-  $("#nextBtn").onclick=()=>{
-    if(!answered) return;
-    if(qi===order.length-1){ finish(); return; }
-    qi++; drawQ();
-  };
-  $("#quitBtn").onclick=()=>{ if(confirm("Quit this test? Progress won't be saved.")) go("home"); };
-
-  function finish(){
-    const sub=QUESTION_BANK[subIdx];
-    const total=order.length;
-    const pct=Math.round(score/total*100);
-    const b=me().best[sub.name];
-    if(!b || pct>b.pct || (pct===b.pct && total>b.total)){
-      me().best[sub.name]={score,total,pct}; save();
+   ]
+  },
+  {
+   "name": "MAPEH",
+   "icon": "🎨",
+   "questions": [
+    {
+     "q": "What does 'sexuality' primarily refer to in the context of health?",
+     "choices": [
+      "The way a person dresses",
+      "The biological differences between male and female",
+      "Only the physical characteristics of a person",
+      "The total expression of an individual's identity, including physical and emotional aspects"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following best defines a 'gender stereotype'?",
+     "choices": [
+      "A law that promotes equality",
+      "A scientific fact about human biology",
+      "A preconceived notion about the roles and behaviors expected of men and women",
+      "A medical condition"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the difference between 'sex' and 'gender'?",
+     "choices": [
+      "They mean exactly the same thing",
+      "Sex is biological; gender is socially constructed",
+      "Sex is socially constructed; gender is biological",
+      "Sex refers to emotions; gender refers to physical traits"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which scenario demonstrates gender bias?",
+     "choices": [
+      "Treating all students equally regardless of gender",
+      "Allowing both boys and girls to join the math club",
+      "Encouraging a girl to pursue engineering",
+      "Assuming only boys can play basketball and only girls can do ballet"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "How can students promote equality and inclusion in sexuality?",
+     "choices": [
+      "By making fun of people who are different",
+      "By ignoring issues of discrimination",
+      "By respecting everyone regardless of their gender identity or sexual orientation",
+      "By enforcing strict traditional gender roles"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is discrimination?",
+     "choices": [
+      "A positive way of grouping people",
+      "Unfair or prejudicial treatment of people and groups based on characteristics like gender or race",
+      "Understanding someone's feelings",
+      "Treating everyone with equal respect"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following is a characteristic of healthy and positive sexuality?",
+     "choices": [
+      "Keeping secrets and manipulating",
+      "Mutual respect and clear communication",
+      "Feeling ashamed of one's body",
+      "Forcing beliefs on others"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Why is it important to break down gender stereotypes?",
+     "choices": [
+      "It makes everyone exactly the same",
+      "It causes confusion in society",
+      "It reinforces traditional rules",
+      "It allows individuals to pursue their true interests and potential without restriction"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What does 'inclusion' mean in a school setting?",
+     "choices": [
+      "Ensuring every student feels valued, respected, and supported",
+      "Separating students based on their skills",
+      "Ignoring the differences among students",
+      "Only grouping students who share the exact same interests"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of the following is an example of promoting respect in relationships?",
+     "choices": [
+      "Telling others what to do",
+      "Listening actively to your partner's or friend's boundaries",
+      "Pressuring someone to agree with you",
+      "Making jokes about someone's gender"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the negative impact of gender discrimination?",
+     "choices": [
+      "It improves academic performance",
+      "It builds strong character",
+      "It helps people know their place",
+      "It can lead to low self-esteem, mental health issues, and unequal opportunities"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "When someone says 'Boys don't cry', this is an example of:",
+     "choices": [
+      "A gender stereotype",
+      "A positive affirmation",
+      "A biological fact",
+      "An inclusive statement"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Empathy plays a big role in positive sexuality because it helps us:",
+     "choices": [
+      "Judge people more accurately",
+      "Win arguments against others",
+      "Keep our emotions hidden",
+      "Understand and share the feelings of others, leading to better respect"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "How can media influence gender bias?",
+     "choices": [
+      "By always showing diverse and equal representation",
+      "Media has absolutely no effect on how we view gender",
+      "By repeatedly showing men and women in traditional, restrictive roles",
+      "By only showing educational documentaries"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which action shows support for a peer facing discrimination?",
+     "choices": [
+      "Laughing along with the bullies",
+      "Telling the peer to just ignore it and be quiet",
+      "Joining in to avoid being targeted too",
+      "Standing up for them and reporting the incident to a trusted adult"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Consent and personal boundaries are essential parts of:",
+     "choices": [
+      "Physical fitness",
+      "Academic success",
+      "Financial stability",
+      "Healthy relationships and positive sexuality"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the best way to address a friend who uses a discriminatory slur?",
+     "choices": [
+      "Calmly explain why the word is harmful and ask them to stop",
+      "Use a slur back at them",
+      "Yell at them in front of everyone",
+      "Ignore it completely"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the main objective of the batting team in a striking/fielding game?",
+     "choices": [
+      "To tag the runners out",
+      "To strike out the batter",
+      "To catch the ball in the air",
+      "To hit the ball and score runs by running around the bases"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following is a classic example of a striking and fielding game?",
+     "choices": [
+      "Soccer",
+      "Basketball",
+      "Volleyball",
+      "Baseball"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the primary role of the fielding team?",
+     "choices": [
+      "To score as many runs as possible",
+      "To prevent the batting team from scoring runs by getting them out",
+      "To run around the bases safely",
+      "To hit the ball as far as they can"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "In striking/fielding games, what happens when a fielder catches a batted ball before it hits the ground?",
+     "choices": [
+      "The batter gets a free run",
+      "The game pauses",
+      "The batter is out",
+      "The batter gets to hit again"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which equipment is essential for a batter in softball or baseball?",
+     "choices": [
+      "A golf club",
+      "A racket",
+      "A bat",
+      "A net"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is a 'home run'?",
+     "choices": [
+      "When a batter hits the ball and successfully circles all bases to score a run",
+      "When a batter strikes out",
+      "When the ball is thrown out of bounds",
+      "When a fielder catches the ball"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Why is teamwork crucial for the fielding team?",
+     "choices": [
+      "To make the game look organized",
+      "Teamwork is only important for the batting team",
+      "So they can all stand in one place",
+      "Players must communicate and cover different areas to effectively get runners out"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What role does the pitcher play in these games?",
+     "choices": [
+      "They are responsible for hitting the ball",
+      "They throw the ball to the batter to initiate the play",
+      "They stand behind the batter to catch the ball",
+      "They keep the score"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "How does a runner get 'tagged out'?",
+     "choices": [
+      "The batter misses the ball three times",
+      "A fielder touches the runner with the ball (or the glove holding the ball) while the runner is not on a base",
+      "The runner trips and falls",
+      "A fielder shouts 'out' when the runner is running"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which physical fitness component is highly developed when a batter hits the ball?",
+     "choices": [
+      "Body composition",
+      "Flexibility",
+      "Cardiovascular endurance",
+      "Hand-eye coordination"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is a 'base' in striking/fielding games?",
+     "choices": [
+      "The boundary line of the field",
+      "The tool used to hit the ball",
+      "A safe zone that runners must touch in sequence to score",
+      "The area where the coach stands"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following requires agility in a fielding game?",
+     "choices": [
+      "Swinging the bat",
+      "Jogging slowly to the dugout",
+      "Quickly changing direction to catch a fast-moving ground ball",
+      "Standing still waiting for the pitch"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is a 'strikeout'?",
+     "choices": [
+      "When the batter hits the ball out of the park",
+      "When a runner steals a base",
+      "When the batter accumulates three strikes and is declared out",
+      "When the pitcher throws four balls"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Who is the player positioned directly behind the batter?",
+     "choices": [
+      "The shortstop",
+      "The umpire",
+      "The catcher",
+      "The center fielder"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the term for an inning ending in baseball/softball?",
+     "choices": [
+      "When the fielding team gets three outs",
+      "When the time runs out",
+      "When everyone has batted once",
+      "When one run is scored"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is 'fair play' in the context of these games?",
+     "choices": [
+      "Refusing to shake hands after a loss",
+      "Respecting the rules, opponents, and officials' decisions",
+      "Doing whatever it takes to win, even cheating",
+      "Arguing with the umpire to get your way"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following is a defensive strategy?",
+     "choices": [
+      "Stealing a base",
+      "Running very fast to first base",
+      "Swinging the bat as hard as possible",
+      "Positioning fielders based on where the batter usually hits"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is 'Cultural Homogenization'?",
+     "choices": [
+      "The invention of new, unique local instruments",
+      "The strict preservation of traditional arts and music",
+      "The practice of keeping cultures completely separated",
+      "The process where local cultures are transformed or absorbed by a dominant outside culture, leading to global sameness"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which factor is a major driver of cultural homogenization today?",
+     "choices": [
+      "Globalization and mass media",
+      "Local community theater",
+      "Isolationism",
+      "Traditional folklore"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is a potential negative effect of cultural homogenization on Music & Arts?",
+     "choices": [
+      "The revival of ancient languages",
+      "Better preservation of historical artifacts",
+      "An increase in the diversity of local art",
+      "The loss of unique indigenous music styles and traditional art forms"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "The worldwide popularity of Western pop music and K-Pop is an example of:",
+     "choices": [
+      "Traditional preservation",
+      "Cultural isolation",
+      "Cultural homogenization",
+      "Indigenous revival"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "How does the internet contribute to cultural homogenization?",
+     "choices": [
+      "By only promoting local village news",
+      "By spreading dominant global trends and media instantly to all parts of the world",
+      "By preventing people from listening to foreign music",
+      "By blocking international content"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is 'Cultural Imperialism'?",
+     "choices": [
+      "When a country rejects all foreign music",
+      "When countries share art equally",
+      "When traditional arts conquer global media",
+      "When a more powerful country heavily influences or dominates the culture of a less powerful country"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "If every country listens to the same Top 40 pop songs, what is lost?",
+     "choices": [
+      "Musical diversity and localized cultural expressions",
+      "The music industry's profits",
+      "The ability to dance",
+      "The use of electronic instruments"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of the following is a common result of cultural homogenization in visual arts?",
+     "choices": [
+      "The exclusive use of natural, local materials",
+      "Art styles becoming standard and mirroring global commercial trends",
+      "A ban on modern art",
+      "Every artist painting only their local history"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "How do local artists sometimes combat cultural homogenization?",
+     "choices": [
+      "By completely copying international pop stars",
+      "By fusing traditional elements with modern styles to keep their culture alive",
+      "By stopping their artistic work",
+      "By only speaking English"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What does 'standardization' in music refer to in this context?",
+     "choices": [
+      "Writing notes on a staff",
+      "Music sounding similar worldwide due to shared production techniques and commercial goals",
+      "Using standard tuning on a guitar",
+      "Teaching music in schools"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is one argued *positive* aspect of cultural homogenization?",
+     "choices": [
+      "It prevents people from learning new things",
+      "It creates a shared global culture and common ground for people from different countries",
+      "It makes everyone think exactly the same way",
+      "It completely destroys local traditions"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "The spread of global fast-fashion brands impacting local traditional clothing is an example of homogenization in:",
+     "choices": [
+      "Architecture",
+      "Visual and applied arts",
+      "Classical music",
+      "Literature"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Why is it important to study cultural homogenization in Music & Arts?",
+     "choices": [
+      "To understand the balance between embracing global trends and protecting our cultural identity",
+      "To memorize the names of pop stars",
+      "To learn how to quickly forget our traditions",
+      "To make sure we only listen to foreign music"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What happens to traditional music when it becomes homogenized?",
+     "choices": [
+      "It becomes exactly as it was 1000 years ago",
+      "It gains a new local language",
+      "It is played only in secret",
+      "It is often diluted, commercialized, or replaced by global pop genres"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following terms describes the mixing of different cultural elements, rather than one erasing the other?",
+     "choices": [
+      "Cultural Hybridization",
+      "Cultural Isolation",
+      "Cultural Homogenization",
+      "Cultural Destruction"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "As global media grows, what is the best way a country can preserve its artistic identity?",
+     "choices": [
+      "By ignoring all international media",
+      "By letting foreign companies control local radio",
+      "By actively supporting, teaching, and funding local arts and music programs",
+      "By banning the internet"
+     ],
+     "correct": 2
     }
-    $("#resEmoji").textContent = pct>=90?"🏆":pct>=75?"🎉":pct>=50?"👍":"📖";
-    $("#resScore").textContent = `${score} / ${total}`;
-    $("#resMsg").textContent = `${pct}% · ${cap(st.currentUser)} on ${sub.name} — `+
-      (pct>=90?"Amazing!":pct>=75?"Great job!":pct>=50?"Getting there, keep practicing!":"Review the misses below and try again!");
-    const ml=$("#missedList"); ml.innerHTML="";
-    if(missed.length){
-      const h=document.createElement("h2"); h.textContent="Review your "+missed.length+" missed item"+(missed.length===1?"":"s");
-      h.style.fontSize="16px"; ml.appendChild(h);
-      missed.forEach(m=>{
-        const d=document.createElement("div"); d.className="miss";
-        const q=document.createElement("div"); q.className="q"; q.textContent=m.q;
-        const y=document.createElement("div"); y.className="yours"; y.textContent="✗ Your answer: "+m.yours;
-        const r=document.createElement("div"); r.className="right"; r.textContent="✓ Correct: "+m.right;
-        d.append(q,y,r); ml.appendChild(d);
+   ]
+  },
+  {
+   "name": "TLE",
+   "icon": "🛠️",
+   "questions": [
+    {
+     "q": "What does RA No. 10844 stand for?",
+     "choices": [
+      "Department of Interconnected Communications Technology Act of 2016",
+      "Department of Internet and Communications Technology Act of 2016",
+      "Department of Information and Communications Technology Act of 2015",
+      "Department of Information and Cyber Technology Act of 2015"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "When was Republic Act No. 10844 signed into law?",
+     "choices": [
+      "June 12, 2016",
+      "July 4, 2015",
+      "May 23, 2016",
+      "May 25, 2015"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What government agency was created by RA No. 10844?",
+     "choices": [
+      "DepEd",
+      "DOST",
+      "DTI",
+      "DICT"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What does DICT stand for?",
+     "choices": [
+      "Department of Internal Communications Technology",
+      "Department of Information and Cyber Technology",
+      "Department of Internet and Computer Technology",
+      "Department of Information and Communications Technology"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the main goal of the DICT according to the law?",
+     "choices": [
+      "To manufacture computer hardware locally",
+      "To regulate social media usage in the country",
+      "To make ICT services more accessible, secure, and beneficial for all Filipinos",
+      "To provide free smartphones to all citizens"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following is a Key ICT-Related Provision of RA No. 10844?",
+     "choices": [
+      "DICT Manufactures Computers",
+      "DICT Regulates Television",
+      "DICT Creates ICT Policies",
+      "DICT Controls Print Media"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Under RA 10844, what does 'DICT Develops ICT Infrastructure' involve?",
+     "choices": [
+      "Developing rules for internet cafes",
+      "Building and improving broadband networks and other ICT facilities",
+      "Promoting digital literacy in schools",
+      "Creating a national cybersecurity plan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which provision focuses on expanding internet access, especially in rural and underserved communities?",
+     "choices": [
+      "DICT Creates ICT Policies",
+      "DICT Promotes Digital Government Services",
+      "DICT Develops ICT Infrastructure",
+      "DICT Protects Cybersecurity"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which DICT provision involves creating a national cybersecurity plan?",
+     "choices": [
+      "DICT Creates ICT Policies",
+      "DICT Protects Cybersecurity",
+      "DICT Promotes Digital Government Services",
+      "DICT Develops ICT Infrastructure"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the purpose of DICT's cybersecurity provision?",
+     "choices": [
+      "To hack foreign networks",
+      "To build physical security walls",
+      "To monitor private social media messages",
+      "To protect government, businesses, and citizens online"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which provision encourages government agencies to provide services online?",
+     "choices": [
+      "DICT Promotes Digital Government Services",
+      "DICT Protects Cybersecurity",
+      "DICT Develops ICT Infrastructure",
+      "DICT Creates ICT Policies"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Making government transactions faster and easier is a goal of which DICT provision?",
+     "choices": [
+      "DICT Develops ICT Infrastructure",
+      "DICT Promotes Digital Government Services",
+      "DICT Protects Cybersecurity",
+      "DICT Creates ICT Policies"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Promoting internet connectivity, digital literacy, and equal access to ICT services falls under which DICT role?",
+     "choices": [
+      "DICT Develops ICT Infrastructure",
+      "DICT Protects Cybersecurity",
+      "DICT Promotes Digital Government Services",
+      "DICT Creates ICT Policies"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "The law that established the DICT is known as Republic Act No. ___.",
+     "choices": [
+      "10844",
+      "8293",
+      "10175",
+      "10627"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "The DICT is responsible for developing and improving the country's ___ sector.",
+     "choices": [
+      "Healthcare",
+      "Agricultural",
+      "Transportation",
+      "Information and Communications Technology (ICT)"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following is NOT one of the 4 Key ICT-Related Provisions of RA 10844 mentioned in the lesson?",
+     "choices": [
+      "DICT Creates ICT Policies",
+      "DICT Protects Cybersecurity",
+      "DICT Regulates Online Influencers",
+      "DICT Develops ICT Infrastructure"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What year is associated with the official title of the Department of Information and Communications Technology Act?",
+     "choices": [
+      "2014",
+      "2017",
+      "2016",
+      "2015"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the process of delivering and communicating with customers to promote or sell products?",
+     "choices": [
+      "Production",
+      "Marketing",
+      "Accounting",
+      "Distribution"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Who are the primary targets of the marketing process according to the presentation?",
+     "choices": [
+      "Customers and clients",
+      "Investors and stakeholders",
+      "Government agencies",
+      "Employees and managers"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the primary purpose of marketing?",
+     "choices": [
+      "To promote or sell products",
+      "To write business laws",
+      "To hire employees",
+      "To manufacture goods"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which aspect of marketing involves talking to the customers in any form?",
+     "choices": [
+      "Customer satisfaction",
+      "Building communication",
+      "After Sale Services",
+      "Product distribution"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is defined as the 'repeated patronage of the product of a certain business leading to the trust of the clients'?",
+     "choices": [
+      "After Sale Services",
+      "Building communication",
+      "Customer satisfaction",
+      "Digital Commerce"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What does 'After Sale Services' refer to?",
+     "choices": [
+      "The manufacturing of a new product",
+      "The process of communicating before a sale",
+      "The company's support to the clients after the product was bought and patronized",
+      "The discounts given during a holiday sale"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What edition of Online Marketing is highlighted in the presentation?",
+     "choices": [
+      "Print Media Edition",
+      "Digital Commerce Edition",
+      "Traditional Trade Edition",
+      "Social Media Edition"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Online marketing utilizes platforms like ___ and websites to promote products or services.",
+     "choices": [
+      "Newspapers",
+      "Email",
+      "Radio",
+      "Billboards"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What does Online Marketing heavily focus on according to the slides?",
+     "choices": [
+      "Physical location",
+      "Printed flyers",
+      "Data",
+      "Word of mouth"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Leveraging the use of ICT in business is primarily discussed in the context of:",
+     "choices": [
+      "Hardware repair",
+      "Online Marketing",
+      "Human Resources",
+      "Cybersecurity"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "If a customer buys a laptop and later calls the company for technical help, what aspect of marketing is this?",
+     "choices": [
+      "Customer satisfaction",
+      "Digital Citizenship",
+      "Building communication",
+      "After Sale Services"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "When a business creates a Facebook page to reply to customer inquiries, they are focusing on:",
+     "choices": [
+      "After Sale Services",
+      "Building communication",
+      "Cybersecurity",
+      "Data analysis"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "A loyal customer who keeps buying the same brand of shoes because they trust it demonstrates:",
+     "choices": [
+      "After Sale Services",
+      "Digital Etiquette",
+      "Digital Law",
+      "Customer satisfaction"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "According to the lesson, marketing includes delivering, promoting, selling, and ___ with customers.",
+     "choices": [
+      "Ignoring",
+      "Hiding information from",
+      "Communicating",
+      "Arguing"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following is NOT listed as one of the 3 aspects to consider on how marketing works?",
+     "choices": [
+      "After Sale Services",
+      "Product Manufacturing",
+      "Building communication",
+      "Customer satisfaction"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Building communication is described as the process of communicating and talking to customers in ___.",
+     "choices": [
+      "Digital form only",
+      "Verbal form only",
+      "Written form only",
+      "Any form"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Who presented the lesson on 'Leveraging the Use of ICT in Online Marketing'?",
+     "choices": [
+      "Mr. Juan Dela Cruz",
+      "Anonymous",
+      "Mrs. Melgrace Alfero",
+      "DICT Secretary"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What refers to the use of technology in a responsible and polite manner?",
+     "choices": [
+      "Digital citizenship",
+      "Online marketing",
+      "Cyberbullying",
+      "Digital commerce"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "According to the definition, digital citizenship involves locating ___ sources.",
+     "choices": [
+      "Biased",
+      "Anonymous",
+      "Entertaining",
+      "Trustworthy"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "A digital citizen must defend and consider ___.",
+     "choices": [
+      "Internet speeds",
+      "Human rights",
+      "Cyber attacks",
+      "Corporate profits"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Using technology and the internet safely, ethically, and respectfully is the definition of:",
+     "choices": [
+      "Digital literacy",
+      "Digital law",
+      "Digital citizenship",
+      "Digital access"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following is an 'Essential Online Practice'?",
+     "choices": [
+      "Uses anonymous accounts to troll",
+      "Thinks before posting online",
+      "Ignores privacy settings",
+      "Shares passwords with friends"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of language should be used online according to essential practices?",
+     "choices": [
+      "Respectful language",
+      "Aggressive language",
+      "Offensive language",
+      "Slang and jargon only"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "A responsible digital citizen protects personal and others' ___.",
+     "choices": [
+      "Follower count",
+      "Privacy",
+      "Social media status",
+      "Money"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What should you do before sharing information online?",
+     "choices": [
+      "Deletes the information",
+      "Verifies information",
+      "Edits the information",
+      "Monetizes the information"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Essential online practices dictate that users should avoid ___ and harmful content.",
+     "choices": [
+      "Online marketing",
+      "Digital literacy",
+      "Cyberbullying",
+      "Digital etiquette"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "A good digital citizen promotes ___ online interactions.",
+     "choices": [
+      "Neutral",
+      "Negative",
+      "Positive",
+      "Argumentative"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which element of digital citizenship refers to the 'ability to use and understand technology effectively'?",
+     "choices": [
+      "Digital Access",
+      "Digital Literacy",
+      "Digital Law",
+      "Digital Etiquette"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which element of digital citizenship refers to 'proper online manners and behavior'?",
+     "choices": [
+      "Digital Literacy",
+      "Digital Commerce",
+      "Digital Law",
+      "Digital Etiquette"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which element refers to 'following rules and laws online'?",
+     "choices": [
+      "Digital Access",
+      "Digital Law",
+      "Digital Etiquette",
+      "Digital Literacy"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "The ability to have equal opportunity to use technology falls under which element?",
+     "choices": [
+      "Digital Law",
+      "Digital Access",
+      "Digital Commerce",
+      "Digital Etiquette"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the title of the lesson discussing digital citizenship?",
+     "choices": [
+      "Digital Commerce Edition",
+      "Leveraging the Use of ICT",
+      "Online Identity and Responsibility",
+      "An Overview of the Laws Behind ICT"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "The phrase 'Privacy Protected' is associated with which concept in the presentation?",
+     "choices": [
+      "Digital Citizenship",
+      "DICT Infrastructure",
+      "Marketing",
+      "Broadband networks"
+     ],
+     "correct": 0
+    }
+   ]
+  }
+ ],
+ "pepay": [
+  {
+   "name": "ESP",
+   "icon": "💛",
+   "questions": [
+    {
+     "q": "Ano ang pinagbabatayan ng dignidad ng isang tao?",
+     "choices": [
+      "Ang kanyang yaman at katayuan sa buhay",
+      "Ang kanyang pagiging tao na nilikha ng Diyos",
+      "Ang kanyang antas ng edukasyon at talino",
+      "Ang kanyang kakayahang kumita ng pera"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Alin sa mga sumusunod ang nagpapatunay na ang tao ay bukod-tangi?",
+     "choices": [
+      "Siya ay may kakayahang kumain at matulog.",
+      "Siya ay may isip at kilos-loob.",
+      "Siya ay nakakapagparami ng lahi.",
+      "Siya ay nakakaramdam ng gutom."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano maipapakita ang paggalang sa dignidad ng kapwa?",
+     "choices": [
+      "Sa pamamagitan ng pagtulong lamang sa mga kaibigan.",
+      "Sa pamamagitan ng pagmamaliit sa mga taong hindi nakapag-aral.",
+      "Sa pamamagitan ng pakikitungo nang maayos sa lahat ng tao anuman ang estado sa buhay.",
+      "Sa pamamagitan ng pag-iwas sa mga taong may kapansanan."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang salitang 'dignidad' ay nagmula sa salitang Latin na 'dignitas', na ang ibig sabihin ay:",
+     "choices": [
+      "Kalayaan at karapatan",
+      "Karapat-dapat at may halaga",
+      "Lakas at kapangyarihan",
+      "Talino at kasanayan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Bakit hindi nawawala ang dignidad ng isang tao kahit siya ay nagkamali?",
+     "choices": [
+      "Dahil ang dignidad ay nabibili.",
+      "Dahil nakadepende ito sa opinyon ng iba.",
+      "Dahil ito ay likas na taglay ng tao mula nang siya ay isilang.",
+      "Dahil madali itong mapalitan."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino sa mga sumusunod ang nagpapakita ng pag-unawa sa kanyang pagiging bukod-tangi?",
+     "choices": [
+      "Si Ana na pilit ginagaya ang buong pagkatao ng kanyang idolo.",
+      "Si Ben na ikinukumpara ang kanyang sarili sa iba at naiinggit.",
+      "Si Clara na tinatanggap ang kanyang mga kalakasan at kahinaan upang mapaunlad ang sarili.",
+      "Si Dan na naniniwalang wala siyang silbi sa lipunan."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang paggalang sa dignidad ay nag-uumpisa sa:",
+     "choices": [
+      "Paggalang sa sarili",
+      "Paggalang sa mga awtoridad",
+      "Paggalang sa kalikasan",
+      "Paggalang sa mga batas"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Alin sa mga sumusunod na sitwasyon ang direktang lumalabag sa dignidad ng tao?",
+     "choices": [
+      "Pagbibigay ng sapat na pasahod sa mga manggagawa.",
+      "Pag-bully sa isang kaklase dahil sa kanyang pisikal na anyo.",
+      "Pagpila nang maayos sa kantina.",
+      "Pagbibigay ng donasyon sa mga nasunugan."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang bawat tao ay hindi mauulit (unrepeatable). Ano ang ibig sabihin nito?",
+     "choices": [
+      "Lahat ng tao ay pare-pareho ang tadhana.",
+      "Walang dalawang tao na may eksaktong parehong katangian at pagkatao.",
+      "Maaaring i-clone ang pagkatao ng isang indibidwal.",
+      "Walang pagbabago sa pag-uugali ng tao mula pagkabata."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano mo matutulungan ang isang taong nawawalan ng tiwala sa kanyang sarili at hindi nakikita ang kanyang halaga?",
+     "choices": [
+      "Kutyain siya upang magising siya sa katotohanan.",
+      "Iwasan siya para hindi ka mahawa sa kanyang kalungkutan.",
+      "Ipaalala sa kanya ang kanyang mga magagandang katangian at ang kanyang likas na halaga bilang tao.",
+      "Sabihin sa kanyang tanggapin na lang na wala siyang kwenta."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang karapatang pantao ay nakabatay sa anong konsepto?",
+     "choices": [
+      "Kayamanan",
+      "Kapangyarihan sa politika",
+      "Dignidad ng tao",
+      "Katanyagan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Bakit mahalagang ituring na 'kapwa' ang ibang tao, hindi bilang isang 'bagay'?",
+     "choices": [
+      "Dahil ang tao ay may damdamin at dignidad na dapat igalang.",
+      "Dahil mas marami silang pera.",
+      "Dahil baka gantihan nila tayo.",
+      "Dahil ito ang utos ng pamahalaan."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Alin ang HINDI katangian ng dignidad?",
+     "choices": [
+      "Ito ay pantay-pantay sa lahat ng tao.",
+      "Ito ay maaaring mawala kung ang tao ay nakagawa ng krimen.",
+      "Ito ay hindi nakadepende sa estado sa buhay.",
+      "Ito ay likas sa tao."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano naipakikita ang pagiging bukod-tangi ng tao gamit ang 'kilos-loob'?",
+     "choices": [
+      "Sa pamamagitan ng pagpili ng tama at mabuti.",
+      "Sa pamamagitan ng paggawa ng kahit anong gusto nang walang pakialam sa iba.",
+      "Sa pamamagitan ng pagsunod sa dikta ng karamihan kahit mali.",
+      "Sa pamamagitan ng pag-iwas sa responsibilidad."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sa kabila ng kahirapan, pinilit ni Mark na mag-aral nang mabuti sa halip na gumawa ng masama. Ano ang ipinapakita nito?",
+     "choices": [
+      "Ginagamit niya ang kanyang isip at kilos-loob para sa kabutihan.",
+      "Gusto niyang maging sikat.",
+      "Pinipilit siya ng kanyang mga magulang.",
+      "Wala siyang ibang choice."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ang pagtatangi (discrimination) base sa kulay ng balat ay paglabag sa anong aspeto ng pagkatao?",
+     "choices": [
+      "Kalayaan sa pagsasalita",
+      "Karapatang bumoto",
+      "Dignidad bilang pantay-pantay na tao",
+      "Karapatan sa edukasyon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang ibig sabihin ng kasabihang 'Ang tao ay hindi para sa kanyang sarili lamang'?",
+     "choices": [
+      "Kailangan ng tao ng yaman ng iba.",
+      "Ang tao ay nilikha upang maglingkod at makipagkapwa-tao.",
+      "Walang kakayahan ang tao na mabuhay mag-isa dahil mahina siya.",
+      "Ang tao ay dapat umasa palagi sa pamahalaan."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano nakakatulong ang pamilya sa pagbuo ng pagpapahalaga sa dignidad ng isang bata?",
+     "choices": [
+      "Sa pamamagitan ng pagbibigay ng lahat ng gusto niyang materyal na bagay.",
+      "Sa pamamagitan ng pagpaparamdam ng unconditional love at pagtuturo ng mabuting asal.",
+      "Sa pamamagitan ng pagdidikta ng kurso na kukunin niya sa kolehiyo.",
+      "Sa pamamagitan ng pagpalo araw-araw."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Alin sa mga sumusunod na propesyon ang nagpapakita ng paggalang sa dignidad ng tao?",
+     "choices": [
+      "Isang doktor na ginagamot ang pasyente kahit walang pambayad.",
+      "Isang guro na pinapahiya ang mahinang estudyante.",
+      "Isang pulis na nangongotong sa mga drayber.",
+      "Isang politiko na ninanakaw ang pondo ng bayan."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ang pagiging 'bukod-tangi' (unique) ay nangangahulugan din ng:",
+     "choices": [
+      "Pagiging mas mataas o superior sa iba.",
+      "Pagkakaroon ng sariling talento, kakayahan, at limitasyon na iba sa lahat.",
+      "Paglayo sa lipunan para hindi magaya ng iba.",
+      "Pagsusuot lamang ng mga mamahaling damit."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang pinakamataas na layunin ng pag-unlad ng sarili at ng ating mga bukod-tanging kakayahan?",
+     "choices": [
+      "Upang yumaman at makilala.",
+      "Upang matulungan ang kapwa at ang lipunan.",
+      "Upang mainggit ang mga kaaway.",
+      "Upang magkaroon ng kapangyarihan sa iba."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang paggalang sa dignidad ng kapwa ay kailangang ibigay sa:",
+     "choices": [
+      "Mga taong may ambag lamang sa ekonomiya.",
+      "Mga kapamilya at kaibigan lamang.",
+      "Lahat ng tao, kabilang ang mga isinilang na may kapansanan o sakit.",
+      "Mga taong nasa gobyerno."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Nakita mong pinagtatawanan ng iyong mga kaklase ang isang batang pulubi. Ano ang pinakamabuting gawin bilang paggalang sa kanyang dignidad?",
+     "choices": [
+      "Makitawa na rin para hindi ka ma-outcast.",
+      "Balewalain ang sitwasyon at umalis.",
+      "Pagsabihan ang mga kaklase na mali ang kanilang ginagawa at tulungan ang bata.",
+      "Kuhanan ng video at i-post sa social media."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ayon sa mga pilosopo, ang tao ay 'obra maestra' ng Diyos. Ito ay dahil:",
+     "choices": [
+      "Ang tao ang pinakamabilis tumakbo sa lahat ng hayop.",
+      "Ang tao ay nilikhang may isip, kalayaan, at kakayahang magmahal.",
+      "Ang tao ay hindi namamatay.",
+      "Ang tao ay walang kahinaan."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa panloob na pag-unawa ng tao sa mga bagay na mabuti at masama?",
+     "choices": [
+      "Konsensya",
+      "Emosyon",
+      "Instinct",
+      "Imahinasyon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ang diskriminasyon sa trabaho ay isang porma ng:",
+     "choices": [
+      "Pagrespeto sa patakaran ng kumpanya",
+      "Paglabag sa dignidad ng tao",
+      "Karapatan ng employer",
+      "Pagsulong sa kalidad ng trabaho"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano mo igagalang ang dignidad ng mga taong iba ang relihiyon sa iyo?",
+     "choices": [
+      "Pilitin silang lumipat sa iyong relihiyon.",
+      "Iwasang makipag-usap sa kanila.",
+      "Irespeto ang kanilang paniniwala at huwag itong gawing katatawanan.",
+      "Sabihin sa kanila na mali ang kanilang sinasamba."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang pagiging indibidwal ng tao ay tumutukoy sa:",
+     "choices": [
+      "Kanyang pagiging kabilang sa isang grupo.",
+      "Kanyang personal na pagkakakilanlan at mga katangian na hindi katulad ng iba.",
+      "Kanyang kakayahang gayahin ang idolo.",
+      "Kanyang kawalan ng pakialam sa lipunan."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Bakit masama ang paggamit ng kapwa bilang 'paraan' o 'instrumento' lamang?",
+     "choices": [
+      "Dahil baka matuklasan nila ito at magalit.",
+      "Dahil ito ay pagtingin sa tao bilang isang kasangkapan at hindi bilang isang tao na may dignidad.",
+      "Dahil mahirap magpanggap.",
+      "Dahil wala itong kapalit na pera."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sa kabila ng pagiging magkaiba ng talento ng mga tao, bakit pantay-pantay pa rin sila?",
+     "choices": [
+      "Dahil lahat ay mamamatay rin.",
+      "Dahil lahat ay nakatira sa iisang mundo.",
+      "Dahil ang batayan ng pagkakapantay-pantay ay ang likas na dignidad, hindi ang kakayahan.",
+      "Dahil lahat ay kinakailangang magtrabaho."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tamang kahulugan ng 'Self-Worth'?",
+     "choices": [
+      "Halaga ng mga ari-arian ng isang tao.",
+      "Pagmamalaki at pagiging arogante.",
+      "Pag-unawa at pagpapahalaga sa sariling dignidad bilang tao.",
+      "Paghihintay ng papuri mula sa iba."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Alin sa mga ito ang halimbawa ng pagyakap sa pagiging bukod-tangi?",
+     "choices": [
+      "Pagtago ng sariling talento dahil sa hiya.",
+      "Pag-develop sa sariling kakayahan sa pagpinta kahit karamihan ng kaibigan ay mahilig sa sports.",
+      "Pagbili ng mga sapatos na uso kahit hindi kailangan.",
+      "Pagkopya sa estilo ng pananalita ng isang sikat na vlogger."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang pagsasabi ng katotohanan ay pagpapakita ng paggalang sa:",
+     "choices": [
+      "Batas trapiko",
+      "Dignidad ng taong kinakausap dahil pinapahalagahan mo ang kanyang karapatang malaman ang totoo.",
+      "Pamahalaan",
+      "Relihiyon"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Kung ang isang tao ay may malubhang karamdaman at hindi na makapagsalita, mayroon pa ba siyang dignidad?",
+     "choices": [
+      "Wala na, dahil wala na siyang silbi.",
+      "Meron, dahil ang dignidad ay hindi nawawala dahil sa sakit.",
+      "Wala na, dahil hindi na siya makapag-isip nang maayos.",
+      "Meron, kung siya ay mayaman."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Alin sa mga sumusunod ang nagpapatibay sa dignidad ng isang pamilya?",
+     "choices": [
+      "Pagkakaroon ng malaking bahay",
+      "Pagmamahalan, pagtutulungan, at pagrespeto sa bawat kasapi",
+      "Pagkakaroon ng maraming utang",
+      "Pag-aaway ng mag-asawa sa harap ng mga anak"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano nauugnay ang pagiging bukod-tangi sa konsepto ng bokasyon o calling?",
+     "choices": [
+      "Ang bawat isa ay may natatanging misyon na tugma sa kanyang mga talento at kakayahan.",
+      "Lahat ay dapat maging doktor o abogado.",
+      "Walang kinalaman ang talento sa magiging trabaho sa hinaharap.",
+      "Ang bokasyon ay nakadepende lang sa swerte."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ang paninira ng reputasyon ng ibang tao (slander/libel) ay masama sapagkat:",
+     "choices": [
+      "Nakakaubos ito ng oras.",
+      "Sinisira nito ang pagtingin ng lipunan sa dignidad ng taong iyon nang walang basehan.",
+      "Baka kasuhan ka sa korte.",
+      "Baka magalit ang iyong mga magulang."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang pinakamahalagang kayamanan ng isang tao na hindi mananakaw ninuman?",
+     "choices": [
+      "Alahas at pera",
+      "Lupa at bahay",
+      "Dignidad at malinis na konsensya",
+      "Titulo at posisyon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang pag-unawa sa iyong pagiging bukod-tangi ay makakatulong sa iyo na:",
+     "choices": [
+      "Maiwasan ang pagkainggit at pagkamuhi sa sarili.",
+      "Maging mapagmataas.",
+      "Layuan ang mga taong walang talento.",
+      "Maging sikat sa buong mundo."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sa anong paraan lumilitaw ang tunay na halaga ng tao?",
+     "choices": [
+      "Sa uri ng kanyang sasakyan.",
+      "Sa dami ng kanyang followers sa social media.",
+      "Sa kanyang mga paninindigan at sa pagmamahal na ibinibigay niya sa kapwa.",
+      "Sa tatak ng kanyang mga damit."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang pag-aalaga sa kalikasan ay nagpapakita rin ng paggalang sa dignidad ng tao. Bakit?",
+     "choices": [
+      "Dahil ang kalikasan ay pinagkukunan ng materyal na yaman.",
+      "Dahil ang maayos na kapaligiran ay karapatan ng bawat tao at ng susunod na henerasyon.",
+      "Dahil maganda itong gawing background sa picture.",
+      "Dahil inuutos ito ng guro sa Science."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Kung ikaw ay naging biktima ng pangungutya (bullying), paano mo mapoprotektahan ang iyong dignidad?",
+     "choices": [
+      "Gumanti at kutyain din sila.",
+      "Maniwala sa kanilang sinasabi at magkulong sa kwarto.",
+      "Alalahanin ang iyong self-worth, huwag pansinin ang paninira, at humingi ng tulong sa kinauukulan.",
+      "Saktan ang sarili."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang pagiging 'matapat' sa sarili (authenticity) ay may kaugnayan sa pagiging bukod-tangi dahil:",
+     "choices": [
+      "Ipinapakita nito na wala kang pakialam sa batas.",
+      "Ipinapahayag mo ang iyong totoong pagkatao kaysa magpanggap para magustuhan ng iba.",
+      "Ibig sabihin nito ay maaari kang maging bastos.",
+      "Ibig sabihin nito ay perpekto ka."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang pangunahing dahilan bakit itinataguyod ng mga bansa ang 'Universal Declaration of Human Rights'?",
+     "choices": [
+      "Upang dumami ang negosyo.",
+      "Upang protektahan ang likas na dignidad at mga karapatan ng bawat tao sa mundo.",
+      "Upang magkaroon ng iisang pera ang buong mundo.",
+      "Upang maging sikat ang mga pinuno."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang pagtulong sa mga matatanda na tumawid sa kalsada ay isang manipestasyon ng:",
+     "choices": [
+      "Pagpapasikat sa mga nakakakita.",
+      "Pagkilala sa kanilang halaga bilang tao at paggalang sa kanilang edad at kahinaan.",
+      "Pagsunod sa utos ng pulis.",
+      "Pagkabagot habang naglalakad."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Paano inilarawan ng mga batas moral ang tao?",
+     "choices": [
+      "Bilang isang nilalang na walang kontrol sa kanyang damdamin.",
+      "Bilang isang hayop na gumagalaw base lang sa instinct.",
+      "Bilang isang nilalang na may responsibilidad na gawin ang tama at iwasan ang mali.",
+      "Bilang isang robot na sumusunod sa program."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Kapag ang isang tao ay nakagawa ng mabigat na kasalanan sa batas, dapat ba siyang tratuhin bilang hayop sa kulungan?",
+     "choices": [
+      "Oo, para hindi na niya ulitin ang kanyang ginawa.",
+      "Oo, dahil nawala na ang kanyang dignidad nang siya ay magkasala.",
+      "Hindi, dahil siya ay tao pa rin na may dignidad na hindi nabubura, at dapat tratuhin nang makatao.",
+      "Hindi, dahil baka magalit ang kanyang pamilya."
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang pakikinig kapag may nagsasalita ay isang simpleng pagpapakita ng:",
+     "choices": [
+      "Pagiging tsismoso.",
+      "Paggalang sa dignidad at karapatan ng taong magpahayag ng kanyang saloobin.",
+      "Pagsunod sa utos kahit labag sa kalooban.",
+      "Katamaran na magsalita."
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Upang masabing ganap na pinahahalagahan ng tao ang kanyang pagiging bukod-tangi, siya ay dapat:",
+     "choices": [
+      "Ibahagi ang kanyang mga natatanging talento para sa ikabubuti ng komunidad.",
+      "Itago ang kanyang talento para hindi nakawin ng iba.",
+      "Ipagbili ang lahat ng kanyang gawa sa pinakamataas na presyo.",
+      "Asahang sambahin siya ng ibang tao."
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sa pangkalahatan, ano ang pinakamabisang pananggalang ng tao laban sa pang-aabuso ng iba?",
+     "choices": [
+      "Ang pagkakaroon ng maraming pera.",
+      "Ang pagkakaroon ng malakas na pangangatawan at mga armas.",
+      "Ang pagkakaroon ng malalim na pagkaunawa sa sariling dignidad at mga karapatan, pati na rin ang paninindigan dito.",
+      "Ang pagiging tahimik at pag-iwas sa gulo sa lahat ng pagkakataon."
+     ],
+     "correct": 2
+    }
+   ]
+  },
+  {
+   "name": "MAPEH",
+   "icon": "🎨",
+   "questions": [
+    {
+     "q": "Ano ang pangunahing tema ng Komedyang Relihiyoso?",
+     "choices": [
+      "Komedya at pagpapatawa",
+      "Labanan ng mga kaharian",
+      "Pang-araw-araw na pamumuhay",
+      "Buhay ng mga santo at relihiyon"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Anong uri ng Komedya ang karaniwang nagpapakita ng labanan sa pagitan ng mga Kristiyano at Muslim?",
+     "choices": [
+      "Moro-moro (Secular)",
+      "Senakulo",
+      "Komedyang Relihiyoso",
+      "Zarzuela"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Saang bansa nagmula ang impluwensya ng Komedya sa Pilipinas?",
+     "choices": [
+      "Hapon",
+      "Amerika",
+      "Espanya",
+      "Tsina"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang karaniwang katapusan o wakas ng isang Moro-moro?",
+     "choices": [
+      "Walang tiyak na wakas",
+      "Pagbibinyag ng mga Muslim sa Kristiyanismo o pagkakasundo",
+      "Pananakop ng ibang bansa",
+      "Kamatayan ng lahat ng tauhan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong uri ng pananalita ang ginagamit sa tradisyunal na Komedya?",
+     "choices": [
+      "Pang-araw-araw na salita",
+      "Wikang banyaga lamang",
+      "Tuluyan o Prose",
+      "Patulang may sukat at tugma"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa tradisyunal na martsa o pagpasok at paglabas ng mga tauhan sa entablado?",
+     "choices": [
+      "Paseo",
+      "Batalla",
+      "Magik",
+      "Danza"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa koreograpikong labanan na may kasamang musika sa Komedya?",
+     "choices": [
+      "Danza",
+      "Awit",
+      "Paseo",
+      "Batalla"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ang mga kasuotan sa Komedya ay karaniwang ___.",
+     "choices": [
+      "Matingkad at kumikinang",
+      "Punit-punit at luma",
+      "Puti at itim lamang",
+      "Mga modernong damit"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang kadalasang nagpapakita ng mahika at kababalaghan sa Komedya?",
+     "choices": [
+      "Mga ordinaryong tao",
+      "Ermitanyo o mga diwata",
+      "Mga sundalo",
+      "Mga hari at reyna"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang Komedya ay karaniwang itinatanghal tuwing kailan?",
+     "choices": [
+      "Mga pista ng bayan",
+      "Araw ng kalayaan",
+      "Pasko lamang",
+      "Araw ng mga patay"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang pangunahing tema ng Komedyang Relihiyoso?",
+     "choices": [
+      "Pang-araw-araw na pamumuhay",
+      "Buhay ng mga santo at relihiyon",
+      "Labanan ng mga kaharian",
+      "Komedya at pagpapatawa"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong uri ng Komedya ang karaniwang nagpapakita ng labanan sa pagitan ng mga Kristiyano at Muslim?",
+     "choices": [
+      "Zarzuela",
+      "Moro-moro (Secular)",
+      "Senakulo",
+      "Komedyang Relihiyoso"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Saang bansa nagmula ang impluwensya ng Komedya sa Pilipinas?",
+     "choices": [
+      "Tsina",
+      "Amerika",
+      "Espanya",
+      "Hapon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang karaniwang katapusan o wakas ng isang Moro-moro?",
+     "choices": [
+      "Pagbibinyag ng mga Muslim sa Kristiyanismo o pagkakasundo",
+      "Kamatayan ng lahat ng tauhan",
+      "Pananakop ng ibang bansa",
+      "Walang tiyak na wakas"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Anong uri ng pananalita ang ginagamit sa tradisyunal na Komedya?",
+     "choices": [
+      "Wikang banyaga lamang",
+      "Tuluyan o Prose",
+      "Pang-araw-araw na salita",
+      "Patulang may sukat at tugma"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa tradisyunal na martsa o pagpasok at paglabas ng mga tauhan sa entablado?",
+     "choices": [
+      "Paseo",
+      "Batalla",
+      "Magik",
+      "Danza"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa koreograpikong labanan na may kasamang musika sa Komedya?",
+     "choices": [
+      "Batalla",
+      "Danza",
+      "Paseo",
+      "Awit"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ang mga kasuotan sa Komedya ay karaniwang ___.",
+     "choices": [
+      "Puti at itim lamang",
+      "Matingkad at kumikinang",
+      "Punit-punit at luma",
+      "Mga modernong damit"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sino ang kadalasang nagpapakita ng mahika at kababalaghan sa Komedya?",
+     "choices": [
+      "Mga hari at reyna",
+      "Mga ordinaryong tao",
+      "Ermitanyo o mga diwata",
+      "Mga sundalo"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang Komedya ay karaniwang itinatanghal tuwing kailan?",
+     "choices": [
+      "Pasko lamang",
+      "Mga pista ng bayan",
+      "Araw ng mga patay",
+      "Araw ng kalayaan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang pangunahing tema ng Komedyang Relihiyoso?",
+     "choices": [
+      "Pang-araw-araw na pamumuhay",
+      "Buhay ng mga santo at relihiyon",
+      "Labanan ng mga kaharian",
+      "Komedya at pagpapatawa"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong uri ng Komedya ang karaniwang nagpapakita ng labanan sa pagitan ng mga Kristiyano at Muslim?",
+     "choices": [
+      "Zarzuela",
+      "Komedyang Relihiyoso",
+      "Moro-moro (Secular)",
+      "Senakulo"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Saang bansa nagmula ang impluwensya ng Komedya sa Pilipinas?",
+     "choices": [
+      "Hapon",
+      "Amerika",
+      "Tsina",
+      "Espanya"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang karaniwang katapusan o wakas ng isang Moro-moro?",
+     "choices": [
+      "Pananakop ng ibang bansa",
+      "Pagbibinyag ng mga Muslim sa Kristiyanismo o pagkakasundo",
+      "Kamatayan ng lahat ng tauhan",
+      "Walang tiyak na wakas"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong uri ng pananalita ang ginagamit sa tradisyunal na Komedya?",
+     "choices": [
+      "Tuluyan o Prose",
+      "Pang-araw-araw na salita",
+      "Patulang may sukat at tugma",
+      "Wikang banyaga lamang"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa tradisyunal na martsa o pagpasok at paglabas ng mga tauhan sa entablado?",
+     "choices": [
+      "Batalla",
+      "Danza",
+      "Paseo",
+      "Magik"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa koreograpikong labanan na may kasamang musika sa Komedya?",
+     "choices": [
+      "Paseo",
+      "Batalla",
+      "Awit",
+      "Danza"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang mga kasuotan sa Komedya ay karaniwang ___.",
+     "choices": [
+      "Mga modernong damit",
+      "Puti at itim lamang",
+      "Matingkad at kumikinang",
+      "Punit-punit at luma"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang kadalasang nagpapakita ng mahika at kababalaghan sa Komedya?",
+     "choices": [
+      "Mga hari at reyna",
+      "Mga ordinaryong tao",
+      "Mga sundalo",
+      "Ermitanyo o mga diwata"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ang Komedya ay karaniwang itinatanghal tuwing kailan?",
+     "choices": [
+      "Mga pista ng bayan",
+      "Araw ng mga patay",
+      "Araw ng kalayaan",
+      "Pasko lamang"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang pangunahing tema ng Komedyang Relihiyoso?",
+     "choices": [
+      "Komedya at pagpapatawa",
+      "Pang-araw-araw na pamumuhay",
+      "Buhay ng mga santo at relihiyon",
+      "Labanan ng mga kaharian"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Anong uri ng Komedya ang karaniwang nagpapakita ng labanan sa pagitan ng mga Kristiyano at Muslim?",
+     "choices": [
+      "Senakulo",
+      "Komedyang Relihiyoso",
+      "Zarzuela",
+      "Moro-moro (Secular)"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Saang bansa nagmula ang impluwensya ng Komedya sa Pilipinas?",
+     "choices": [
+      "Tsina",
+      "Espanya",
+      "Amerika",
+      "Hapon"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang karaniwang katapusan o wakas ng isang Moro-moro?",
+     "choices": [
+      "Walang tiyak na wakas",
+      "Pananakop ng ibang bansa",
+      "Kamatayan ng lahat ng tauhan",
+      "Pagbibinyag ng mga Muslim sa Kristiyanismo o pagkakasundo"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Anong uri ng pananalita ang ginagamit sa tradisyunal na Komedya?",
+     "choices": [
+      "Tuluyan o Prose",
+      "Pang-araw-araw na salita",
+      "Wikang banyaga lamang",
+      "Patulang may sukat at tugma"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa tradisyunal na martsa o pagpasok at paglabas ng mga tauhan sa entablado?",
+     "choices": [
+      "Paseo",
+      "Magik",
+      "Danza",
+      "Batalla"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa koreograpikong labanan na may kasamang musika sa Komedya?",
+     "choices": [
+      "Batalla",
+      "Paseo",
+      "Awit",
+      "Danza"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ang mga kasuotan sa Komedya ay karaniwang ___.",
+     "choices": [
+      "Mga modernong damit",
+      "Matingkad at kumikinang",
+      "Punit-punit at luma",
+      "Puti at itim lamang"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sino ang kadalasang nagpapakita ng mahika at kababalaghan sa Komedya?",
+     "choices": [
+      "Mga hari at reyna",
+      "Mga ordinaryong tao",
+      "Ermitanyo o mga diwata",
+      "Mga sundalo"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ang Komedya ay karaniwang itinatanghal tuwing kailan?",
+     "choices": [
+      "Mga pista ng bayan",
+      "Pasko lamang",
+      "Araw ng mga patay",
+      "Araw ng kalayaan"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang pangunahing tema ng Komedyang Relihiyoso?",
+     "choices": [
+      "Labanan ng mga kaharian",
+      "Buhay ng mga santo at relihiyon",
+      "Komedya at pagpapatawa",
+      "Pang-araw-araw na pamumuhay"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong uri ng Komedya ang karaniwang nagpapakita ng labanan sa pagitan ng mga Kristiyano at Muslim?",
+     "choices": [
+      "Senakulo",
+      "Moro-moro (Secular)",
+      "Komedyang Relihiyoso",
+      "Zarzuela"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Saang bansa nagmula ang impluwensya ng Komedya sa Pilipinas?",
+     "choices": [
+      "Tsina",
+      "Amerika",
+      "Espanya",
+      "Hapon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang karaniwang katapusan o wakas ng isang Moro-moro?",
+     "choices": [
+      "Kamatayan ng lahat ng tauhan",
+      "Pananakop ng ibang bansa",
+      "Pagbibinyag ng mga Muslim sa Kristiyanismo o pagkakasundo",
+      "Walang tiyak na wakas"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Anong uri ng pananalita ang ginagamit sa tradisyunal na Komedya?",
+     "choices": [
+      "Tuluyan o Prose",
+      "Wikang banyaga lamang",
+      "Pang-araw-araw na salita",
+      "Patulang may sukat at tugma"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa tradisyunal na martsa o pagpasok at paglabas ng mga tauhan sa entablado?",
+     "choices": [
+      "Danza",
+      "Batalla",
+      "Paseo",
+      "Magik"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa koreograpikong labanan na may kasamang musika sa Komedya?",
+     "choices": [
+      "Awit",
+      "Batalla",
+      "Paseo",
+      "Danza"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang mga kasuotan sa Komedya ay karaniwang ___.",
+     "choices": [
+      "Puti at itim lamang",
+      "Mga modernong damit",
+      "Matingkad at kumikinang",
+      "Punit-punit at luma"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang kadalasang nagpapakita ng mahika at kababalaghan sa Komedya?",
+     "choices": [
+      "Mga ordinaryong tao",
+      "Ermitanyo o mga diwata",
+      "Mga hari at reyna",
+      "Mga sundalo"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ang Komedya ay karaniwang itinatanghal tuwing kailan?",
+     "choices": [
+      "Araw ng mga patay",
+      "Pasko lamang",
+      "Mga pista ng bayan",
+      "Araw ng kalayaan"
+     ],
+     "correct": 2
+    }
+   ]
+  },
+  {
+   "name": "Science",
+   "icon": "🔬",
+   "questions": [
+    {
+     "q": "What type of change occurs during 'Melting ice'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "No Change",
+      "Phase Change"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of change occurs during 'Burning wood'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "No Change",
+      "Phase Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Rusting of iron'?",
+     "choices": [
+      "Chemical Change",
+      "Phase Change",
+      "No Change",
+      "Physical Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Boiling water'?",
+     "choices": [
+      "Chemical Change",
+      "No Change",
+      "Physical Change",
+      "Phase Change"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What type of change occurs during 'Baking a cake'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "Phase Change",
+      "No Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Dissolving sugar in water'?",
+     "choices": [
+      "No Change",
+      "Physical Change",
+      "Chemical Change",
+      "Phase Change"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of change occurs during 'Breaking a glass window'?",
+     "choices": [
+      "No Change",
+      "Chemical Change",
+      "Phase Change",
+      "Physical Change"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What type of change occurs during 'Cooking an egg'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "Phase Change",
+      "No Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Freezing water into ice cubes'?",
+     "choices": [
+      "Chemical Change",
+      "Phase Change",
+      "No Change",
+      "Physical Change"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What type of change occurs during 'Tearing paper into pieces'?",
+     "choices": [
+      "Phase Change",
+      "Physical Change",
+      "Chemical Change",
+      "No Change"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of change occurs during 'Digesting food'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "Phase Change",
+      "No Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Chopping wood'?",
+     "choices": [
+      "No Change",
+      "Phase Change",
+      "Chemical Change",
+      "Physical Change"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What type of change occurs during 'Mixing sand and water'?",
+     "choices": [
+      "No Change",
+      "Physical Change",
+      "Chemical Change",
+      "Phase Change"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of change occurs during 'Souring of milk'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "No Change",
+      "Phase Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Melting wax'?",
+     "choices": [
+      "No Change",
+      "Physical Change",
+      "Chemical Change",
+      "Phase Change"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of change occurs during 'Burning paper'?",
+     "choices": [
+      "Chemical Change",
+      "Phase Change",
+      "Physical Change",
+      "No Change"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What type of change occurs during 'Crushing a can'?",
+     "choices": [
+      "No Change",
+      "Chemical Change",
+      "Phase Change",
+      "Physical Change"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What type of change occurs during 'Rotting fruit'?",
+     "choices": [
+      "Phase Change",
+      "No Change",
+      "Physical Change",
+      "Chemical Change"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What type of change occurs during 'Sublimation of dry ice'?",
+     "choices": [
+      "Chemical Change",
+      "Physical Change",
+      "Phase Change",
+      "No Change"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What type of change occurs during 'Fireworks exploding'?",
+     "choices": [
+      "Physical Change",
+      "No Change",
+      "Chemical Change",
+      "Phase Change"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Is the process of 'Melting ice' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Burning wood' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Rusting of iron' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Boiling water' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Baking a cake' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Dissolving sugar in water' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Breaking a glass window' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Cooking an egg' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Freezing water into ice cubes' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Tearing paper into pieces' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Digesting food' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Chopping wood' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Mixing sand and water' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Souring of milk' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Melting wax' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Burning paper' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Crushing a can' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Rotting fruit' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Is the process of 'Sublimation of dry ice' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Is the process of 'Fireworks exploding' reversible or irreversible?",
+     "choices": [
+      "Reversible",
+      "Irreversible",
+      "Both",
+      "Neither"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What state of matter has a definite shape and volume?",
+     "choices": [
+      "Plasma",
+      "Gas",
+      "Liquid",
+      "Solid"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What state of matter takes the shape of its container but has a definite volume?",
+     "choices": [
+      "Solid",
+      "Liquid",
+      "Gas",
+      "Plasma"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What state of matter has no definite shape and no definite volume?",
+     "choices": [
+      "Solid",
+      "Plasma",
+      "Gas",
+      "Liquid"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the process of a solid turning directly into a gas called?",
+     "choices": [
+      "Melting",
+      "Condensation",
+      "Freezing",
+      "Sublimation"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the process of a gas turning into a liquid called?",
+     "choices": [
+      "Freezing",
+      "Condensation",
+      "Evaporation",
+      "Sublimation"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following is an indicator of a chemical change?",
+     "choices": [
+      "Change in color or odor",
+      "Change in size",
+      "Change in shape",
+      "Change in state"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What happens to particles of matter when heated?",
+     "choices": [
+      "They shrink",
+      "They stop moving",
+      "They move faster",
+      "They slow down"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Matter is defined as anything that has mass and takes up ___.",
+     "choices": [
+      "Time",
+      "Space",
+      "Light",
+      "Energy"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which process involves the release of heat?",
+     "choices": [
+      "Melting",
+      "Evaporation",
+      "Freezing",
+      "Sublimation"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "In a physical change, the substance's chemical identity ____.",
+     "choices": [
+      "Changes completely",
+      "Remains the same",
+      "Disappears",
+      "Becomes a gas"
+     ],
+     "correct": 1
+    }
+   ]
+  },
+  {
+   "name": "AP",
+   "icon": "🌏",
+   "questions": [
+    {
+     "q": "Sino ang tinaguriang 'Ama ng Katipunan'?",
+     "choices": [
+      "Emilio Aguinaldo",
+      "Apolinario Mabini",
+      "Andres Bonifacio",
+      "Jose Rizal"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Kailan itinatag ang Katipunan (KKK)?",
+     "choices": [
+      "Agosto 23, 1896",
+      "Hunyo 12, 1898",
+      "Hulyo 7, 1892",
+      "Disyembre 30, 1896"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang ibig sabihin ng KKK?",
+     "choices": [
+      "Kagalanggalangang, Kataastaasang Katipunan",
+      "Kilusang Kabataan para sa Kalayaan",
+      "Katipunan ng mga Kabataan para sa Kalayaan",
+      "Kataastaasan, Kagalanggalangang Katipunan ng mga Anak ng Bayan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Sino ang tinaguriang 'Utak ng Katipunan'?",
+     "choices": [
+      "Emilio Jacinto",
+      "Antonio Luna",
+      "Andres Bonifacio",
+      "Apolinario Mabini"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa opisyal na pahayagan ng Katipunan?",
+     "choices": [
+      "Kalayaan",
+      "El Filibusterismo",
+      "La Solidaridad",
+      "Diario de Manila"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang dokumentong naglalaman ng mga aral at tuntunin ng Katipunan?",
+     "choices": [
+      "Konstitusyon ng Malolos",
+      "Deklarasyon ng Kalayaan",
+      "Kartilya",
+      "Noli Me Tangere"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang sumulat ng Kartilya ng Katipunan?",
+     "choices": [
+      "Andres Bonifacio",
+      "Emilio Jacinto",
+      "Jose Rizal",
+      "Graciano Lopez Jaena"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong pangyayari ang naging hudyat ng pagsisimula ng himagsikan laban sa mga Espanyol?",
+     "choices": [
+      "Labanan sa Mactan",
+      "Sigaw sa Pugad Lawin",
+      "Kasunduan sa Biak-na-Bato",
+      "Kumbensyon sa Tejeros"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang ginawa ng mga Katipunero sa Pugad Lawin bilang tanda ng paghihimagsik?",
+     "choices": [
+      "Pinunit ang kanilang sedula",
+      "Nagtago sa mga kweba",
+      "Nagsunog ng mga bandilang Espanyol",
+      "Sumulat ng liham sa Hari ng Espanya"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Saan lihim na itinatag ang Katipunan?",
+     "choices": [
+      "Malolos, Bulacan",
+      "Kawit, Cavite",
+      "Calamba, Laguna",
+      "Azcarraga St., Tondo, Maynila"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Sino ang tinaguriang 'Ama ng Katipunan'?",
+     "choices": [
+      "Jose Rizal",
+      "Apolinario Mabini",
+      "Andres Bonifacio",
+      "Emilio Aguinaldo"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Kailan itinatag ang Katipunan (KKK)?",
+     "choices": [
+      "Disyembre 30, 1896",
+      "Agosto 23, 1896",
+      "Hunyo 12, 1898",
+      "Hulyo 7, 1892"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang ibig sabihin ng KKK?",
+     "choices": [
+      "Kataastaasan, Kagalanggalangang Katipunan ng mga Anak ng Bayan",
+      "Kagalanggalangang, Kataastaasang Katipunan",
+      "Katipunan ng mga Kabataan para sa Kalayaan",
+      "Kilusang Kabataan para sa Kalayaan"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang tinaguriang 'Utak ng Katipunan'?",
+     "choices": [
+      "Andres Bonifacio",
+      "Antonio Luna",
+      "Emilio Jacinto",
+      "Apolinario Mabini"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa opisyal na pahayagan ng Katipunan?",
+     "choices": [
+      "El Filibusterismo",
+      "Diario de Manila",
+      "Kalayaan",
+      "La Solidaridad"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang dokumentong naglalaman ng mga aral at tuntunin ng Katipunan?",
+     "choices": [
+      "Deklarasyon ng Kalayaan",
+      "Konstitusyon ng Malolos",
+      "Kartilya",
+      "Noli Me Tangere"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang sumulat ng Kartilya ng Katipunan?",
+     "choices": [
+      "Graciano Lopez Jaena",
+      "Andres Bonifacio",
+      "Emilio Jacinto",
+      "Jose Rizal"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Anong pangyayari ang naging hudyat ng pagsisimula ng himagsikan laban sa mga Espanyol?",
+     "choices": [
+      "Labanan sa Mactan",
+      "Kasunduan sa Biak-na-Bato",
+      "Sigaw sa Pugad Lawin",
+      "Kumbensyon sa Tejeros"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang ginawa ng mga Katipunero sa Pugad Lawin bilang tanda ng paghihimagsik?",
+     "choices": [
+      "Nagsunog ng mga bandilang Espanyol",
+      "Pinunit ang kanilang sedula",
+      "Sumulat ng liham sa Hari ng Espanya",
+      "Nagtago sa mga kweba"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Saan lihim na itinatag ang Katipunan?",
+     "choices": [
+      "Azcarraga St., Tondo, Maynila",
+      "Calamba, Laguna",
+      "Malolos, Bulacan",
+      "Kawit, Cavite"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang tinaguriang 'Ama ng Katipunan'?",
+     "choices": [
+      "Jose Rizal",
+      "Andres Bonifacio",
+      "Emilio Aguinaldo",
+      "Apolinario Mabini"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Kailan itinatag ang Katipunan (KKK)?",
+     "choices": [
+      "Disyembre 30, 1896",
+      "Hulyo 7, 1892",
+      "Agosto 23, 1896",
+      "Hunyo 12, 1898"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang ibig sabihin ng KKK?",
+     "choices": [
+      "Katipunan ng mga Kabataan para sa Kalayaan",
+      "Kilusang Kabataan para sa Kalayaan",
+      "Kagalanggalangang, Kataastaasang Katipunan",
+      "Kataastaasan, Kagalanggalangang Katipunan ng mga Anak ng Bayan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Sino ang tinaguriang 'Utak ng Katipunan'?",
+     "choices": [
+      "Andres Bonifacio",
+      "Emilio Jacinto",
+      "Antonio Luna",
+      "Apolinario Mabini"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa opisyal na pahayagan ng Katipunan?",
+     "choices": [
+      "El Filibusterismo",
+      "La Solidaridad",
+      "Diario de Manila",
+      "Kalayaan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang dokumentong naglalaman ng mga aral at tuntunin ng Katipunan?",
+     "choices": [
+      "Kartilya",
+      "Konstitusyon ng Malolos",
+      "Noli Me Tangere",
+      "Deklarasyon ng Kalayaan"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang sumulat ng Kartilya ng Katipunan?",
+     "choices": [
+      "Andres Bonifacio",
+      "Graciano Lopez Jaena",
+      "Emilio Jacinto",
+      "Jose Rizal"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Anong pangyayari ang naging hudyat ng pagsisimula ng himagsikan laban sa mga Espanyol?",
+     "choices": [
+      "Kasunduan sa Biak-na-Bato",
+      "Kumbensyon sa Tejeros",
+      "Sigaw sa Pugad Lawin",
+      "Labanan sa Mactan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang ginawa ng mga Katipunero sa Pugad Lawin bilang tanda ng paghihimagsik?",
+     "choices": [
+      "Nagsunog ng mga bandilang Espanyol",
+      "Sumulat ng liham sa Hari ng Espanya",
+      "Nagtago sa mga kweba",
+      "Pinunit ang kanilang sedula"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Saan lihim na itinatag ang Katipunan?",
+     "choices": [
+      "Kawit, Cavite",
+      "Azcarraga St., Tondo, Maynila",
+      "Calamba, Laguna",
+      "Malolos, Bulacan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sino ang tinaguriang 'Ama ng Katipunan'?",
+     "choices": [
+      "Emilio Aguinaldo",
+      "Apolinario Mabini",
+      "Jose Rizal",
+      "Andres Bonifacio"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Kailan itinatag ang Katipunan (KKK)?",
+     "choices": [
+      "Agosto 23, 1896",
+      "Hunyo 12, 1898",
+      "Hulyo 7, 1892",
+      "Disyembre 30, 1896"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang ibig sabihin ng KKK?",
+     "choices": [
+      "Katipunan ng mga Kabataan para sa Kalayaan",
+      "Kagalanggalangang, Kataastaasang Katipunan",
+      "Kataastaasan, Kagalanggalangang Katipunan ng mga Anak ng Bayan",
+      "Kilusang Kabataan para sa Kalayaan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang tinaguriang 'Utak ng Katipunan'?",
+     "choices": [
+      "Andres Bonifacio",
+      "Emilio Jacinto",
+      "Antonio Luna",
+      "Apolinario Mabini"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa opisyal na pahayagan ng Katipunan?",
+     "choices": [
+      "La Solidaridad",
+      "El Filibusterismo",
+      "Kalayaan",
+      "Diario de Manila"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang dokumentong naglalaman ng mga aral at tuntunin ng Katipunan?",
+     "choices": [
+      "Deklarasyon ng Kalayaan",
+      "Noli Me Tangere",
+      "Kartilya",
+      "Konstitusyon ng Malolos"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang sumulat ng Kartilya ng Katipunan?",
+     "choices": [
+      "Emilio Jacinto",
+      "Jose Rizal",
+      "Andres Bonifacio",
+      "Graciano Lopez Jaena"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Anong pangyayari ang naging hudyat ng pagsisimula ng himagsikan laban sa mga Espanyol?",
+     "choices": [
+      "Kasunduan sa Biak-na-Bato",
+      "Labanan sa Mactan",
+      "Kumbensyon sa Tejeros",
+      "Sigaw sa Pugad Lawin"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang ginawa ng mga Katipunero sa Pugad Lawin bilang tanda ng paghihimagsik?",
+     "choices": [
+      "Nagtago sa mga kweba",
+      "Pinunit ang kanilang sedula",
+      "Nagsunog ng mga bandilang Espanyol",
+      "Sumulat ng liham sa Hari ng Espanya"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Saan lihim na itinatag ang Katipunan?",
+     "choices": [
+      "Malolos, Bulacan",
+      "Azcarraga St., Tondo, Maynila",
+      "Calamba, Laguna",
+      "Kawit, Cavite"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sino ang tinaguriang 'Ama ng Katipunan'?",
+     "choices": [
+      "Andres Bonifacio",
+      "Jose Rizal",
+      "Apolinario Mabini",
+      "Emilio Aguinaldo"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Kailan itinatag ang Katipunan (KKK)?",
+     "choices": [
+      "Hulyo 7, 1892",
+      "Agosto 23, 1896",
+      "Hunyo 12, 1898",
+      "Disyembre 30, 1896"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang ibig sabihin ng KKK?",
+     "choices": [
+      "Kagalanggalangang, Kataastaasang Katipunan",
+      "Kilusang Kabataan para sa Kalayaan",
+      "Kataastaasan, Kagalanggalangang Katipunan ng mga Anak ng Bayan",
+      "Katipunan ng mga Kabataan para sa Kalayaan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang tinaguriang 'Utak ng Katipunan'?",
+     "choices": [
+      "Antonio Luna",
+      "Emilio Jacinto",
+      "Apolinario Mabini",
+      "Andres Bonifacio"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa opisyal na pahayagan ng Katipunan?",
+     "choices": [
+      "La Solidaridad",
+      "El Filibusterismo",
+      "Diario de Manila",
+      "Kalayaan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang dokumentong naglalaman ng mga aral at tuntunin ng Katipunan?",
+     "choices": [
+      "Noli Me Tangere",
+      "Kartilya",
+      "Deklarasyon ng Kalayaan",
+      "Konstitusyon ng Malolos"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sino ang sumulat ng Kartilya ng Katipunan?",
+     "choices": [
+      "Jose Rizal",
+      "Emilio Jacinto",
+      "Andres Bonifacio",
+      "Graciano Lopez Jaena"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong pangyayari ang naging hudyat ng pagsisimula ng himagsikan laban sa mga Espanyol?",
+     "choices": [
+      "Kasunduan sa Biak-na-Bato",
+      "Kumbensyon sa Tejeros",
+      "Sigaw sa Pugad Lawin",
+      "Labanan sa Mactan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang ginawa ng mga Katipunero sa Pugad Lawin bilang tanda ng paghihimagsik?",
+     "choices": [
+      "Sumulat ng liham sa Hari ng Espanya",
+      "Pinunit ang kanilang sedula",
+      "Nagtago sa mga kweba",
+      "Nagsunog ng mga bandilang Espanyol"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Saan lihim na itinatag ang Katipunan?",
+     "choices": [
+      "Azcarraga St., Tondo, Maynila",
+      "Malolos, Bulacan",
+      "Kawit, Cavite",
+      "Calamba, Laguna"
+     ],
+     "correct": 0
+    }
+   ]
+  },
+  {
+   "name": "English",
+   "icon": "📖",
+   "questions": [
+    {
+     "q": "Which figure of speech compares two unlike things using 'like' or 'as'?",
+     "choices": [
+      "Personification",
+      "Metaphor",
+      "Hyperbole",
+      "Simile"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What figure of speech is: 'The wind whispered through the trees'?",
+     "choices": [
+      "Hyperbole",
+      "Metaphor",
+      "Personification",
+      "Simile"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What figure of speech is: 'I am so hungry I could eat a horse'?",
+     "choices": [
+      "Metaphor",
+      "Hyperbole",
+      "Simile",
+      "Irony"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which figure of speech is a direct comparison without using 'like' or 'as'?",
+     "choices": [
+      "Irony",
+      "Personification",
+      "Metaphor",
+      "Simile"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What figure of speech is: 'He is a shining star'?",
+     "choices": [
+      "Simile",
+      "Personification",
+      "Metaphor",
+      "Hyperbole"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What element of a story refers to the time and place the events occur?",
+     "choices": [
+      "Plot",
+      "Theme",
+      "Setting",
+      "Character"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What element is the sequence of events in a story?",
+     "choices": [
+      "Theme",
+      "Plot",
+      "Character",
+      "Setting"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the central message or underlying meaning of a story?",
+     "choices": [
+      "Theme",
+      "Setting",
+      "Plot",
+      "Conflict"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the struggle between opposing forces in a story called?",
+     "choices": [
+      "Theme",
+      "Conflict",
+      "Resolution",
+      "Plot"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Who is the main character in a story?",
+     "choices": [
+      "Protagonist",
+      "Antagonist",
+      "Narrator",
+      "Foil"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which type of irony occurs when the audience knows something the characters do not?",
+     "choices": [
+      "Situational Irony",
+      "Cosmic Irony",
+      "Dramatic Irony",
+      "Verbal Irony"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which type of irony occurs when the opposite of what is expected happens?",
+     "choices": [
+      "Situational Irony",
+      "Dramatic Irony",
+      "Verbal Irony",
+      "Sarcasm"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which type of irony occurs when someone says the opposite of what they mean?",
+     "choices": [
+      "Verbal Irony",
+      "Situational Irony",
+      "Coincidence",
+      "Dramatic Irony"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "A fire station burning down is an example of which type of irony?",
+     "choices": [
+      "Situational Irony",
+      "Dramatic Irony",
+      "Verbal Irony",
+      "Hyperbole"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which figure of speech compares two unlike things using 'like' or 'as'?",
+     "choices": [
+      "Hyperbole",
+      "Personification",
+      "Metaphor",
+      "Simile"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What figure of speech is: 'The wind whispered through the trees'?",
+     "choices": [
+      "Simile",
+      "Metaphor",
+      "Hyperbole",
+      "Personification"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What figure of speech is: 'I am so hungry I could eat a horse'?",
+     "choices": [
+      "Irony",
+      "Metaphor",
+      "Simile",
+      "Hyperbole"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which figure of speech is a direct comparison without using 'like' or 'as'?",
+     "choices": [
+      "Personification",
+      "Simile",
+      "Metaphor",
+      "Irony"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What figure of speech is: 'He is a shining star'?",
+     "choices": [
+      "Metaphor",
+      "Simile",
+      "Personification",
+      "Hyperbole"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What element of a story refers to the time and place the events occur?",
+     "choices": [
+      "Theme",
+      "Plot",
+      "Setting",
+      "Character"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What element is the sequence of events in a story?",
+     "choices": [
+      "Plot",
+      "Theme",
+      "Character",
+      "Setting"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the central message or underlying meaning of a story?",
+     "choices": [
+      "Plot",
+      "Theme",
+      "Conflict",
+      "Setting"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the struggle between opposing forces in a story called?",
+     "choices": [
+      "Conflict",
+      "Theme",
+      "Resolution",
+      "Plot"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Who is the main character in a story?",
+     "choices": [
+      "Protagonist",
+      "Antagonist",
+      "Narrator",
+      "Foil"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which type of irony occurs when the audience knows something the characters do not?",
+     "choices": [
+      "Dramatic Irony",
+      "Cosmic Irony",
+      "Situational Irony",
+      "Verbal Irony"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which type of irony occurs when the opposite of what is expected happens?",
+     "choices": [
+      "Dramatic Irony",
+      "Sarcasm",
+      "Verbal Irony",
+      "Situational Irony"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which type of irony occurs when someone says the opposite of what they mean?",
+     "choices": [
+      "Verbal Irony",
+      "Situational Irony",
+      "Coincidence",
+      "Dramatic Irony"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "A fire station burning down is an example of which type of irony?",
+     "choices": [
+      "Dramatic Irony",
+      "Situational Irony",
+      "Hyperbole",
+      "Verbal Irony"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which figure of speech compares two unlike things using 'like' or 'as'?",
+     "choices": [
+      "Hyperbole",
+      "Personification",
+      "Metaphor",
+      "Simile"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What figure of speech is: 'The wind whispered through the trees'?",
+     "choices": [
+      "Metaphor",
+      "Simile",
+      "Hyperbole",
+      "Personification"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What figure of speech is: 'I am so hungry I could eat a horse'?",
+     "choices": [
+      "Simile",
+      "Irony",
+      "Metaphor",
+      "Hyperbole"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which figure of speech is a direct comparison without using 'like' or 'as'?",
+     "choices": [
+      "Personification",
+      "Irony",
+      "Metaphor",
+      "Simile"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What figure of speech is: 'He is a shining star'?",
+     "choices": [
+      "Simile",
+      "Personification",
+      "Metaphor",
+      "Hyperbole"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What element of a story refers to the time and place the events occur?",
+     "choices": [
+      "Theme",
+      "Plot",
+      "Setting",
+      "Character"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What element is the sequence of events in a story?",
+     "choices": [
+      "Plot",
+      "Theme",
+      "Character",
+      "Setting"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the central message or underlying meaning of a story?",
+     "choices": [
+      "Setting",
+      "Plot",
+      "Conflict",
+      "Theme"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the struggle between opposing forces in a story called?",
+     "choices": [
+      "Conflict",
+      "Plot",
+      "Resolution",
+      "Theme"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Who is the main character in a story?",
+     "choices": [
+      "Protagonist",
+      "Antagonist",
+      "Narrator",
+      "Foil"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which type of irony occurs when the audience knows something the characters do not?",
+     "choices": [
+      "Verbal Irony",
+      "Dramatic Irony",
+      "Cosmic Irony",
+      "Situational Irony"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which type of irony occurs when the opposite of what is expected happens?",
+     "choices": [
+      "Sarcasm",
+      "Dramatic Irony",
+      "Situational Irony",
+      "Verbal Irony"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which type of irony occurs when someone says the opposite of what they mean?",
+     "choices": [
+      "Verbal Irony",
+      "Dramatic Irony",
+      "Situational Irony",
+      "Coincidence"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "A fire station burning down is an example of which type of irony?",
+     "choices": [
+      "Verbal Irony",
+      "Dramatic Irony",
+      "Situational Irony",
+      "Hyperbole"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which figure of speech compares two unlike things using 'like' or 'as'?",
+     "choices": [
+      "Hyperbole",
+      "Simile",
+      "Metaphor",
+      "Personification"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What figure of speech is: 'The wind whispered through the trees'?",
+     "choices": [
+      "Hyperbole",
+      "Personification",
+      "Metaphor",
+      "Simile"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What figure of speech is: 'I am so hungry I could eat a horse'?",
+     "choices": [
+      "Metaphor",
+      "Irony",
+      "Simile",
+      "Hyperbole"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which figure of speech is a direct comparison without using 'like' or 'as'?",
+     "choices": [
+      "Simile",
+      "Personification",
+      "Irony",
+      "Metaphor"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What figure of speech is: 'He is a shining star'?",
+     "choices": [
+      "Hyperbole",
+      "Metaphor",
+      "Personification",
+      "Simile"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What element of a story refers to the time and place the events occur?",
+     "choices": [
+      "Setting",
+      "Character",
+      "Theme",
+      "Plot"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What element is the sequence of events in a story?",
+     "choices": [
+      "Theme",
+      "Plot",
+      "Character",
+      "Setting"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the central message or underlying meaning of a story?",
+     "choices": [
+      "Conflict",
+      "Setting",
+      "Theme",
+      "Plot"
+     ],
+     "correct": 2
+    }
+   ]
+  },
+  {
+   "name": "Filipino",
+   "icon": "🇵🇭",
+   "questions": [
+    {
+     "q": "Ano ang pangunahing layunin ng tekstong naratibo?",
+     "choices": [
+      "Manghikayat ng mambabasa",
+      "Maglarawan ng isang bagay",
+      "Magbigay ng impormasyon",
+      "Magsalaysay ng mga pangyayari o kwento"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Alin sa mga sumusunod ang HINDI elemento ng tekstong naratibo?",
+     "choices": [
+      "Banghay",
+      "Ebidensya",
+      "Tagpuan",
+      "Tauhan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa pagkakasunod-sunod ng mga pangyayari sa isang kwento?",
+     "choices": [
+      "Tema",
+      "Pananaw",
+      "Banghay",
+      "Tunggalian"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Anong elemento ang tumutukoy sa lugar at panahon kung saan nangyari ang kwento?",
+     "choices": [
+      "Tagpuan",
+      "Banghay",
+      "Tauhan",
+      "Tema"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang nagpapadaloy at kumikilos sa loob ng isang tekstong naratibo?",
+     "choices": [
+      "Manunulat",
+      "Tauhan",
+      "Mambabasa",
+      "Tagpuan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa problemang kinakaharap ng pangunahing tauhan sa kwento?",
+     "choices": [
+      "Kakalasan",
+      "Kasukdulan",
+      "Wakas",
+      "Tunggalian"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Kapag ang kwento ay isinalaysay gamit ang 'ako', anong pananaw ito?",
+     "choices": [
+      "Unang Panauhan",
+      "Ikatlong Panauhan",
+      "Walang Panauhan",
+      "Ikalawang Panauhan"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa pinakamataas na antas ng pananabik sa isang kwento?",
+     "choices": [
+      "Wakas",
+      "Kakalasan",
+      "Simula",
+      "Kasukdulan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Alin sa mga sumusunod ang halimbawa ng tekstong naratibo?",
+     "choices": [
+      "Editoryal",
+      "Balita sa diyaryo",
+      "Resipe ng Pagkain",
+      "Maikling Kwento"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa sentral na ideya o mensahe kwento?",
+     "choices": [
+      "Tunggalian",
+      "Tema",
+      "Tagpuan",
+      "Banghay"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang pangunahing layunin ng tekstong naratibo?",
+     "choices": [
+      "Maglarawan ng isang bagay",
+      "Magbigay ng impormasyon",
+      "Magsalaysay ng mga pangyayari o kwento",
+      "Manghikayat ng mambabasa"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Alin sa mga sumusunod ang HINDI elemento ng tekstong naratibo?",
+     "choices": [
+      "Tagpuan",
+      "Banghay",
+      "Ebidensya",
+      "Tauhan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa pagkakasunod-sunod ng mga pangyayari sa isang kwento?",
+     "choices": [
+      "Tunggalian",
+      "Banghay",
+      "Tema",
+      "Pananaw"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong elemento ang tumutukoy sa lugar at panahon kung saan nangyari ang kwento?",
+     "choices": [
+      "Tagpuan",
+      "Tema",
+      "Banghay",
+      "Tauhan"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang nagpapadaloy at kumikilos sa loob ng isang tekstong naratibo?",
+     "choices": [
+      "Manunulat",
+      "Tagpuan",
+      "Mambabasa",
+      "Tauhan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa problemang kinakaharap ng pangunahing tauhan sa kwento?",
+     "choices": [
+      "Kasukdulan",
+      "Wakas",
+      "Tunggalian",
+      "Kakalasan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Kapag ang kwento ay isinalaysay gamit ang 'ako', anong pananaw ito?",
+     "choices": [
+      "Walang Panauhan",
+      "Ikatlong Panauhan",
+      "Unang Panauhan",
+      "Ikalawang Panauhan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa pinakamataas na antas ng pananabik sa isang kwento?",
+     "choices": [
+      "Simula",
+      "Kasukdulan",
+      "Kakalasan",
+      "Wakas"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Alin sa mga sumusunod ang halimbawa ng tekstong naratibo?",
+     "choices": [
+      "Maikling Kwento",
+      "Resipe ng Pagkain",
+      "Editoryal",
+      "Balita sa diyaryo"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa sentral na ideya o mensahe kwento?",
+     "choices": [
+      "Tema",
+      "Tunggalian",
+      "Tagpuan",
+      "Banghay"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang pangunahing layunin ng tekstong naratibo?",
+     "choices": [
+      "Manghikayat ng mambabasa",
+      "Maglarawan ng isang bagay",
+      "Magsalaysay ng mga pangyayari o kwento",
+      "Magbigay ng impormasyon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Alin sa mga sumusunod ang HINDI elemento ng tekstong naratibo?",
+     "choices": [
+      "Tauhan",
+      "Ebidensya",
+      "Banghay",
+      "Tagpuan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa pagkakasunod-sunod ng mga pangyayari sa isang kwento?",
+     "choices": [
+      "Tunggalian",
+      "Tema",
+      "Pananaw",
+      "Banghay"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Anong elemento ang tumutukoy sa lugar at panahon kung saan nangyari ang kwento?",
+     "choices": [
+      "Tauhan",
+      "Banghay",
+      "Tagpuan",
+      "Tema"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Sino ang nagpapadaloy at kumikilos sa loob ng isang tekstong naratibo?",
+     "choices": [
+      "Tagpuan",
+      "Tauhan",
+      "Mambabasa",
+      "Manunulat"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa problemang kinakaharap ng pangunahing tauhan sa kwento?",
+     "choices": [
+      "Kasukdulan",
+      "Kakalasan",
+      "Tunggalian",
+      "Wakas"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Kapag ang kwento ay isinalaysay gamit ang 'ako', anong pananaw ito?",
+     "choices": [
+      "Walang Panauhan",
+      "Ikalawang Panauhan",
+      "Ikatlong Panauhan",
+      "Unang Panauhan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa pinakamataas na antas ng pananabik sa isang kwento?",
+     "choices": [
+      "Wakas",
+      "Kasukdulan",
+      "Kakalasan",
+      "Simula"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Alin sa mga sumusunod ang halimbawa ng tekstong naratibo?",
+     "choices": [
+      "Maikling Kwento",
+      "Balita sa diyaryo",
+      "Resipe ng Pagkain",
+      "Editoryal"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang tawag sa sentral na ideya o mensahe kwento?",
+     "choices": [
+      "Banghay",
+      "Tunggalian",
+      "Tagpuan",
+      "Tema"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang pangunahing layunin ng tekstong naratibo?",
+     "choices": [
+      "Magsalaysay ng mga pangyayari o kwento",
+      "Maglarawan ng isang bagay",
+      "Manghikayat ng mambabasa",
+      "Magbigay ng impormasyon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Alin sa mga sumusunod ang HINDI elemento ng tekstong naratibo?",
+     "choices": [
+      "Banghay",
+      "Tauhan",
+      "Ebidensya",
+      "Tagpuan"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa pagkakasunod-sunod ng mga pangyayari sa isang kwento?",
+     "choices": [
+      "Tema",
+      "Tunggalian",
+      "Pananaw",
+      "Banghay"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Anong elemento ang tumutukoy sa lugar at panahon kung saan nangyari ang kwento?",
+     "choices": [
+      "Tagpuan",
+      "Tauhan",
+      "Banghay",
+      "Tema"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Sino ang nagpapadaloy at kumikilos sa loob ng isang tekstong naratibo?",
+     "choices": [
+      "Tagpuan",
+      "Mambabasa",
+      "Tauhan",
+      "Manunulat"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa problemang kinakaharap ng pangunahing tauhan sa kwento?",
+     "choices": [
+      "Kasukdulan",
+      "Kakalasan",
+      "Tunggalian",
+      "Wakas"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Kapag ang kwento ay isinalaysay gamit ang 'ako', anong pananaw ito?",
+     "choices": [
+      "Walang Panauhan",
+      "Unang Panauhan",
+      "Ikalawang Panauhan",
+      "Ikatlong Panauhan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Ano ang tawag sa pinakamataas na antas ng pananabik sa isang kwento?",
+     "choices": [
+      "Kasukdulan",
+      "Wakas",
+      "Kakalasan",
+      "Simula"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Alin sa mga sumusunod ang halimbawa ng tekstong naratibo?",
+     "choices": [
+      "Editoryal",
+      "Balita sa diyaryo",
+      "Resipe ng Pagkain",
+      "Maikling Kwento"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa sentral na ideya o mensahe kwento?",
+     "choices": [
+      "Tema",
+      "Tagpuan",
+      "Banghay",
+      "Tunggalian"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Ano ang pangunahing layunin ng tekstong naratibo?",
+     "choices": [
+      "Maglarawan ng isang bagay",
+      "Manghikayat ng mambabasa",
+      "Magbigay ng impormasyon",
+      "Magsalaysay ng mga pangyayari o kwento"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Alin sa mga sumusunod ang HINDI elemento ng tekstong naratibo?",
+     "choices": [
+      "Tagpuan",
+      "Banghay",
+      "Tauhan",
+      "Ebidensya"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa pagkakasunod-sunod ng mga pangyayari sa isang kwento?",
+     "choices": [
+      "Tunggalian",
+      "Banghay",
+      "Pananaw",
+      "Tema"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Anong elemento ang tumutukoy sa lugar at panahon kung saan nangyari ang kwento?",
+     "choices": [
+      "Tauhan",
+      "Tagpuan",
+      "Banghay",
+      "Tema"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Sino ang nagpapadaloy at kumikilos sa loob ng isang tekstong naratibo?",
+     "choices": [
+      "Mambabasa",
+      "Tagpuan",
+      "Tauhan",
+      "Manunulat"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Ano ang tawag sa problemang kinakaharap ng pangunahing tauhan sa kwento?",
+     "choices": [
+      "Wakas",
+      "Kakalasan",
+      "Kasukdulan",
+      "Tunggalian"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Kapag ang kwento ay isinalaysay gamit ang 'ako', anong pananaw ito?",
+     "choices": [
+      "Ikalawang Panauhan",
+      "Ikatlong Panauhan",
+      "Walang Panauhan",
+      "Unang Panauhan"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa pinakamataas na antas ng pananabik sa isang kwento?",
+     "choices": [
+      "Wakas",
+      "Kasukdulan",
+      "Simula",
+      "Kakalasan"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Alin sa mga sumusunod ang halimbawa ng tekstong naratibo?",
+     "choices": [
+      "Resipe ng Pagkain",
+      "Balita sa diyaryo",
+      "Editoryal",
+      "Maikling Kwento"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Ano ang tawag sa sentral na ideya o mensahe kwento?",
+     "choices": [
+      "Tunggalian",
+      "Tagpuan",
+      "Tema",
+      "Banghay"
+     ],
+     "correct": 2
+    }
+   ]
+  },
+  {
+   "name": "Math",
+   "icon": "➗",
+   "questions": [
+    {
+     "q": "What is the result of 15.63 * 17.02?",
+     "choices": [
+      "265.52",
+      "268.32",
+      "266.02",
+      "267.12"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 28.85 * 1.49?",
+     "choices": [
+      "45.29",
+      "42.49",
+      "44.09",
+      "42.99"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 42.27 + 7.17?",
+     "choices": [
+      "48.94",
+      "50.54",
+      "51.74",
+      "49.44"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 8.16 + 2.69?",
+     "choices": [
+      "11.95",
+      "10.85",
+      "13.15",
+      "10.35"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the result of 7.66 - 9.55?",
+     "choices": [
+      "-1.89",
+      "0.41",
+      "-0.79",
+      "-2.39"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the result of 7.54 * 7.36?",
+     "choices": [
+      "56.59",
+      "54.99",
+      "55.49",
+      "57.79"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 21.57 - 18.57?",
+     "choices": [
+      "2.5",
+      "3.0",
+      "5.3",
+      "4.1"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the result of 12.93 + 5.87?",
+     "choices": [
+      "18.8",
+      "18.3",
+      "19.9",
+      "21.1"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the result of 28.24 * 1.68?",
+     "choices": [
+      "46.94",
+      "47.44",
+      "48.54",
+      "49.74"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the result of 4.38 - 16.32?",
+     "choices": [
+      "-11.94",
+      "-12.44",
+      "-10.84",
+      "-9.64"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the result of 29.83 - 12.62?",
+     "choices": [
+      "19.51",
+      "16.71",
+      "17.21",
+      "18.31"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 24.24 + 4.94?",
+     "choices": [
+      "31.48",
+      "30.28",
+      "28.68",
+      "29.18"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 12.0 * 15.22?",
+     "choices": [
+      "184.94",
+      "182.14",
+      "182.64",
+      "183.74"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 22.16 + 14.9?",
+     "choices": [
+      "36.56",
+      "39.36",
+      "37.06",
+      "38.16"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 16.28 + 2.89?",
+     "choices": [
+      "18.67",
+      "20.27",
+      "19.17",
+      "21.47"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 19.51 + 14.6?",
+     "choices": [
+      "33.61",
+      "35.21",
+      "36.41",
+      "34.11"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 2.98 * 3.75?",
+     "choices": [
+      "13.48",
+      "10.68",
+      "11.18",
+      "12.28"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 1.06 + 1.61?",
+     "choices": [
+      "2.67",
+      "4.97",
+      "3.77",
+      "2.17"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the result of 29.6 + 7.05?",
+     "choices": [
+      "38.95",
+      "37.75",
+      "36.65",
+      "36.15"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the result of 7.98 - 9.49?",
+     "choices": [
+      "-2.01",
+      "0.79",
+      "-0.41",
+      "-1.51"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 40.59 + 2.57?",
+     "choices": [
+      "44.26",
+      "42.66",
+      "45.46",
+      "43.16"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 19.31 * 14.99?",
+     "choices": [
+      "290.56",
+      "288.96",
+      "291.76",
+      "289.46"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 45.66 - 4.68?",
+     "choices": [
+      "43.28",
+      "42.08",
+      "40.48",
+      "40.98"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the result of 29.76 + 14.79?",
+     "choices": [
+      "46.85",
+      "44.55",
+      "44.05",
+      "45.65"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the result of 7.46 - 1.25?",
+     "choices": [
+      "8.51",
+      "5.71",
+      "6.21",
+      "7.31"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of these shapes CANNOT tessellate by itself?",
+     "choices": [
+      "Equilateral Triangle",
+      "Regular Pentagon",
+      "Regular Hexagon",
+      "Square"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of these shapes CANNOT tessellate by itself?",
+     "choices": [
+      "Regular Hexagon",
+      "Equilateral Triangle",
+      "Square",
+      "Regular Pentagon"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following regular polygons can tessellate a plane?",
+     "choices": [
+      "Square",
+      "Heptagon",
+      "Pentagon",
+      "Octagon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of these shapes CANNOT tessellate by itself?",
+     "choices": [
+      "Square",
+      "Regular Hexagon",
+      "Equilateral Triangle",
+      "Regular Pentagon"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which artist is famous for his complex mathematical tessellations?",
+     "choices": [
+      "Leonardo da Vinci",
+      "Pablo Picasso",
+      "Vincent van Gogh",
+      "M.C. Escher"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of these shapes CANNOT tessellate by itself?",
+     "choices": [
+      "Regular Pentagon",
+      "Equilateral Triangle",
+      "Regular Hexagon",
+      "Square"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of the following regular polygons can tessellate a plane?",
+     "choices": [
+      "Square",
+      "Heptagon",
+      "Pentagon",
+      "Octagon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which artist is famous for his complex mathematical tessellations?",
+     "choices": [
+      "Vincent van Gogh",
+      "Pablo Picasso",
+      "M.C. Escher",
+      "Leonardo da Vinci"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which artist is famous for his complex mathematical tessellations?",
+     "choices": [
+      "Leonardo da Vinci",
+      "Pablo Picasso",
+      "M.C. Escher",
+      "Vincent van Gogh"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the sum of angles at any vertex in a valid tessellation?",
+     "choices": [
+      "540 degrees",
+      "270 degrees",
+      "360 degrees",
+      "180 degrees"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following regular polygons can tessellate a plane?",
+     "choices": [
+      "Square",
+      "Pentagon",
+      "Heptagon",
+      "Octagon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of these shapes CANNOT tessellate by itself?",
+     "choices": [
+      "Regular Pentagon",
+      "Square",
+      "Equilateral Triangle",
+      "Regular Hexagon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of the following regular polygons can tessellate a plane?",
+     "choices": [
+      "Octagon",
+      "Square",
+      "Heptagon",
+      "Pentagon"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the sum of angles at any vertex in a valid tessellation?",
+     "choices": [
+      "270 degrees",
+      "540 degrees",
+      "180 degrees",
+      "360 degrees"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "A tessellation is also known as a ___.",
+     "choices": [
+      "Fractal",
+      "Mosaic",
+      "Tiling",
+      "Grid"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the sum of angles at any vertex in a valid tessellation?",
+     "choices": [
+      "270 degrees",
+      "540 degrees",
+      "360 degrees",
+      "180 degrees"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "A tessellation is also known as a ___.",
+     "choices": [
+      "Tiling",
+      "Fractal",
+      "Grid",
+      "Mosaic"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the sum of angles at any vertex in a valid tessellation?",
+     "choices": [
+      "180 degrees",
+      "360 degrees",
+      "270 degrees",
+      "540 degrees"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the sum of angles at any vertex in a valid tessellation?",
+     "choices": [
+      "360 degrees",
+      "270 degrees",
+      "180 degrees",
+      "540 degrees"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "A tessellation is also known as a ___.",
+     "choices": [
+      "Mosaic",
+      "Fractal",
+      "Tiling",
+      "Grid"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following regular polygons can tessellate a plane?",
+     "choices": [
+      "Pentagon",
+      "Octagon",
+      "Square",
+      "Heptagon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following regular polygons can tessellate a plane?",
+     "choices": [
+      "Pentagon",
+      "Octagon",
+      "Square",
+      "Heptagon"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which artist is famous for his complex mathematical tessellations?",
+     "choices": [
+      "Vincent van Gogh",
+      "M.C. Escher",
+      "Leonardo da Vinci",
+      "Pablo Picasso"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "A tessellation is also known as a ___.",
+     "choices": [
+      "Fractal",
+      "Tiling",
+      "Grid",
+      "Mosaic"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which artist is famous for his complex mathematical tessellations?",
+     "choices": [
+      "Vincent van Gogh",
+      "Pablo Picasso",
+      "M.C. Escher",
+      "Leonardo da Vinci"
+     ],
+     "correct": 2
+    }
+   ]
+  },
+  {
+   "name": "TLE",
+   "icon": "🛠️",
+   "questions": [
+    {
+     "q": "What is the most common fish raised in backyard ponds in the Philippines?",
+     "choices": [
+      "Tuna",
+      "Salmon",
+      "Tilapia",
+      "Milkfish (Bangus)"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the term used for young fish that are ready to be stocked in a pond?",
+     "choices": [
+      "Fingerlings",
+      "Spawners",
+      "Fry",
+      "Broodstock"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Why is maintaining proper water pH important in fish raising?",
+     "choices": [
+      "It prevents evaporation",
+      "It stops fish from eating",
+      "It makes the water look clear",
+      "It affects fish health and growth"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following is a natural food source for fish in a pond?",
+     "choices": [
+      "Commercial pellets",
+      "Corn",
+      "Bread",
+      "Plankton"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What farming structure is usually built in lakes or rivers surrounded by nets?",
+     "choices": [
+      "Fish pond",
+      "Aquarium",
+      "Fish pen",
+      "Fish bowl"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the ideal color of pond water indicating a good supply of natural food?",
+     "choices": [
+      "Black",
+      "Brown",
+      "Clear",
+      "Light green"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the process of removing marketable size fish from the pond?",
+     "choices": [
+      "Harvesting",
+      "Stocking",
+      "Feeding",
+      "Breeding"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of the following helps increase oxygen levels in the pond?",
+     "choices": [
+      "Filter net",
+      "Water pump",
+      "Aerator",
+      "Thermometer"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the first step in preparing a fish pond?",
+     "choices": [
+      "Stocking fingerlings",
+      "Filling with water",
+      "Pond draining and drying",
+      "Feeding"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Milkfish is locally known in the Philippines as ___.",
+     "choices": [
+      "Galunggong",
+      "Lapu-lapu",
+      "Bangus",
+      "Tilapia"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the most common fish raised in backyard ponds in the Philippines?",
+     "choices": [
+      "Salmon",
+      "Tilapia",
+      "Milkfish (Bangus)",
+      "Tuna"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the term used for young fish that are ready to be stocked in a pond?",
+     "choices": [
+      "Broodstock",
+      "Fingerlings",
+      "Fry",
+      "Spawners"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Why is maintaining proper water pH important in fish raising?",
+     "choices": [
+      "It makes the water look clear",
+      "It prevents evaporation",
+      "It affects fish health and growth",
+      "It stops fish from eating"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following is a natural food source for fish in a pond?",
+     "choices": [
+      "Plankton",
+      "Commercial pellets",
+      "Bread",
+      "Corn"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What farming structure is usually built in lakes or rivers surrounded by nets?",
+     "choices": [
+      "Fish bowl",
+      "Fish pond",
+      "Aquarium",
+      "Fish pen"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the ideal color of pond water indicating a good supply of natural food?",
+     "choices": [
+      "Clear",
+      "Brown",
+      "Light green",
+      "Black"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the process of removing marketable size fish from the pond?",
+     "choices": [
+      "Breeding",
+      "Feeding",
+      "Harvesting",
+      "Stocking"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Which of the following helps increase oxygen levels in the pond?",
+     "choices": [
+      "Filter net",
+      "Aerator",
+      "Water pump",
+      "Thermometer"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the first step in preparing a fish pond?",
+     "choices": [
+      "Stocking fingerlings",
+      "Feeding",
+      "Pond draining and drying",
+      "Filling with water"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Milkfish is locally known in the Philippines as ___.",
+     "choices": [
+      "Lapu-lapu",
+      "Galunggong",
+      "Tilapia",
+      "Bangus"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the most common fish raised in backyard ponds in the Philippines?",
+     "choices": [
+      "Tilapia",
+      "Milkfish (Bangus)",
+      "Salmon",
+      "Tuna"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the term used for young fish that are ready to be stocked in a pond?",
+     "choices": [
+      "Spawners",
+      "Fry",
+      "Fingerlings",
+      "Broodstock"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Why is maintaining proper water pH important in fish raising?",
+     "choices": [
+      "It stops fish from eating",
+      "It affects fish health and growth",
+      "It prevents evaporation",
+      "It makes the water look clear"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following is a natural food source for fish in a pond?",
+     "choices": [
+      "Commercial pellets",
+      "Plankton",
+      "Corn",
+      "Bread"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What farming structure is usually built in lakes or rivers surrounded by nets?",
+     "choices": [
+      "Fish pond",
+      "Aquarium",
+      "Fish pen",
+      "Fish bowl"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the ideal color of pond water indicating a good supply of natural food?",
+     "choices": [
+      "Light green",
+      "Brown",
+      "Black",
+      "Clear"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the process of removing marketable size fish from the pond?",
+     "choices": [
+      "Feeding",
+      "Harvesting",
+      "Stocking",
+      "Breeding"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following helps increase oxygen levels in the pond?",
+     "choices": [
+      "Water pump",
+      "Aerator",
+      "Thermometer",
+      "Filter net"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the first step in preparing a fish pond?",
+     "choices": [
+      "Filling with water",
+      "Pond draining and drying",
+      "Feeding",
+      "Stocking fingerlings"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Milkfish is locally known in the Philippines as ___.",
+     "choices": [
+      "Tilapia",
+      "Galunggong",
+      "Lapu-lapu",
+      "Bangus"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the most common fish raised in backyard ponds in the Philippines?",
+     "choices": [
+      "Salmon",
+      "Tuna",
+      "Milkfish (Bangus)",
+      "Tilapia"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the term used for young fish that are ready to be stocked in a pond?",
+     "choices": [
+      "Fingerlings",
+      "Broodstock",
+      "Fry",
+      "Spawners"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Why is maintaining proper water pH important in fish raising?",
+     "choices": [
+      "It affects fish health and growth",
+      "It makes the water look clear",
+      "It prevents evaporation",
+      "It stops fish from eating"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "Which of the following is a natural food source for fish in a pond?",
+     "choices": [
+      "Commercial pellets",
+      "Bread",
+      "Plankton",
+      "Corn"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What farming structure is usually built in lakes or rivers surrounded by nets?",
+     "choices": [
+      "Aquarium",
+      "Fish pen",
+      "Fish bowl",
+      "Fish pond"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the ideal color of pond water indicating a good supply of natural food?",
+     "choices": [
+      "Black",
+      "Light green",
+      "Clear",
+      "Brown"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the process of removing marketable size fish from the pond?",
+     "choices": [
+      "Stocking",
+      "Breeding",
+      "Feeding",
+      "Harvesting"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Which of the following helps increase oxygen levels in the pond?",
+     "choices": [
+      "Thermometer",
+      "Filter net",
+      "Aerator",
+      "Water pump"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the first step in preparing a fish pond?",
+     "choices": [
+      "Stocking fingerlings",
+      "Pond draining and drying",
+      "Filling with water",
+      "Feeding"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Milkfish is locally known in the Philippines as ___.",
+     "choices": [
+      "Tilapia",
+      "Galunggong",
+      "Bangus",
+      "Lapu-lapu"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the most common fish raised in backyard ponds in the Philippines?",
+     "choices": [
+      "Tilapia",
+      "Milkfish (Bangus)",
+      "Tuna",
+      "Salmon"
+     ],
+     "correct": 0
+    },
+    {
+     "q": "What is the term used for young fish that are ready to be stocked in a pond?",
+     "choices": [
+      "Fry",
+      "Broodstock",
+      "Spawners",
+      "Fingerlings"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "Why is maintaining proper water pH important in fish raising?",
+     "choices": [
+      "It makes the water look clear",
+      "It affects fish health and growth",
+      "It prevents evaporation",
+      "It stops fish from eating"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following is a natural food source for fish in a pond?",
+     "choices": [
+      "Commercial pellets",
+      "Bread",
+      "Corn",
+      "Plankton"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What farming structure is usually built in lakes or rivers surrounded by nets?",
+     "choices": [
+      "Fish bowl",
+      "Fish pen",
+      "Aquarium",
+      "Fish pond"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "What is the ideal color of pond water indicating a good supply of natural food?",
+     "choices": [
+      "Brown",
+      "Black",
+      "Light green",
+      "Clear"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "What is the process of removing marketable size fish from the pond?",
+     "choices": [
+      "Stocking",
+      "Harvesting",
+      "Feeding",
+      "Breeding"
+     ],
+     "correct": 1
+    },
+    {
+     "q": "Which of the following helps increase oxygen levels in the pond?",
+     "choices": [
+      "Water pump",
+      "Thermometer",
+      "Filter net",
+      "Aerator"
+     ],
+     "correct": 3
+    },
+    {
+     "q": "What is the first step in preparing a fish pond?",
+     "choices": [
+      "Feeding",
+      "Filling with water",
+      "Pond draining and drying",
+      "Stocking fingerlings"
+     ],
+     "correct": 2
+    },
+    {
+     "q": "Milkfish is locally known in the Philippines as ___.",
+     "choices": [
+      "Lapu-lapu",
+      "Tilapia",
+      "Galunggong",
+      "Bangus"
+     ],
+     "correct": 3
+    }
+   ]
+  }
+ ]
+};
+  </script>
+  <script>
+    (function () {
+      "use strict";
+      const $ = s => document.querySelector(s);
+      const $$ = s => Array.from(document.querySelectorAll(s));
+      const STORE = "reviewr.mc.v1";
+      const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+      /* ---------- state ---------- */
+      let st = load();
+      function load() {
+        try { const raw = JSON.parse(localStorage.getItem(STORE)); if (raw && raw.users) return raw; } catch (e) { }
+        return { currentUser: "popoy", users: { popoy: { best: {} }, pepay: { best: {} } } };
+      }
+      function save() { localStorage.setItem(STORE, JSON.stringify(st)); }
+      const me = () => st.users[st.currentUser];
+      const bank = () => QUESTION_BANKS[st.currentUser];
+
+      /* ---------- profiles ---------- */
+      function renderProfiles() {
+        $$(".profile").forEach(p => p.classList.toggle("active", p.dataset.user === st.currentUser));
+        const s = document.documentElement.style;
+        if (st.currentUser === "pepay") { s.setProperty("--brand", "#ff5c9d"); s.setProperty("--brand2", "#ffab5c"); }
+        else { s.setProperty("--brand", "#7c5cff"); s.setProperty("--brand2", "#5cc8ff"); }
+        const bk = bank(), tq = bk.reduce((n, sub) => n + sub.questions.length, 0);
+        $(".tag").textContent = `${cap(st.currentUser)}'s practice tests · ${bk.length} subjects · ${tq} questions`;
+        $("#foot").textContent = "Reviewing as " + cap(st.currentUser) + " · scores are saved on this device";
+      }
+      $$(".profile").forEach(p => p.onclick = () => {
+        st.currentUser = p.dataset.user; save(); renderProfiles(); go("home");
       });
-    }
-    go("result");
-  }
-  $("#retryBtn").onclick=startTest;
 
-  /* ---------- keyboard ---------- */
-  document.addEventListener("keydown",e=>{
-    if(!$("#scr-quiz").classList.contains("active")) return;
-    const k=e.key.toLowerCase();
-    const map={a:0,b:1,c:2,d:3,"1":0,"2":1,"3":2,"4":3};
-    if(k in map){
-      const opts=$$("#qOpts .opt");
-      if(opts[map[k]] && !answered) opts[map[k]].click();
-    } else if(k==="enter"&&answered){ $("#nextBtn").click(); }
-  });
+      /* ---------- screens ---------- */
+      window.go = function (name) {
+        $$(".screen").forEach(x => x.classList.remove("active"));
+        $("#scr-" + name).classList.add("active");
+        if (name === "home") renderHome();
+      };
 
-  /* ---------- init ---------- */
-  renderProfiles(); renderHome();
-})();
-</script>
+      /* ---------- home ---------- */
+      function renderHome() {
+        const g = $("#subjectGrid"); g.innerHTML = "";
+        bank().forEach((sub, i) => {
+          const b = me().best[sub.name];
+          const el = document.createElement("button"); el.className = "subject";
+          el.innerHTML = `<div class="ico">${sub.icon}</div><h3></h3>
+        <div class="meta">${sub.questions.length} items</div>
+        <div class="best ${b && b.pct >= 80 ? 'gold' : ''}">${b ? `Best: ${b.score}/${b.total} (${b.pct}%)` : "Not taken yet"}</div>`;
+          el.querySelector("h3").textContent = sub.name;
+          el.onclick = () => openSetup(i);
+          g.appendChild(el);
+        });
+      }
+
+      /* ---------- setup ---------- */
+      let subIdx = 0, testLen = 50;
+      function openSetup(i) {
+        subIdx = i;
+        const sub = bank()[i];
+        $("#setupTitle").textContent = sub.icon + " " + sub.name;
+        const b = me().best[sub.name];
+        $("#setupHint").textContent = (b ? `${cap(st.currentUser)}'s best: ${b.score}/${b.total} (${b.pct}%). ` : "") +
+          "Questions are shuffled every attempt. Answer with the buttons or keys A–D / 1–4.";
+        go("setup");
+      }
+      $$("#lenChips .chip").forEach(c => c.onclick = () => {
+        $$("#lenChips .chip").forEach(x => x.classList.remove("active"));
+        c.classList.add("active"); testLen = parseInt(c.dataset.len, 10);
+      });
+      $("#startBtn").onclick = startTest;
+
+      /* ---------- quiz ---------- */
+      let order = [], qi = 0, score = 0, missed = [], answered = false;
+      function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+      function startTest() {
+        const sub = bank()[subIdx];
+        order = shuffle(sub.questions.map((_, i) => i)).slice(0, Math.min(testLen, sub.questions.length));
+        qi = 0; score = 0; missed = [];
+        go("quiz"); drawQ();
+      }
+
+      function drawQ() {
+        const sub = bank()[subIdx];
+        const q = sub.questions[order[qi]];
+        answered = false;
+        $("#pbar").style.width = Math.round(qi / order.length * 100) + "%";
+        $("#qCounter").textContent = `${sub.icon} ${sub.name} · Question ${qi + 1} of ${order.length}`;
+        $("#qScore").textContent = `Score: ${score}`;
+        $("#qText").textContent = q.q;
+        $("#qFeed").className = "feedback";
+        $("#nextBtn").style.visibility = "hidden";
+        const box = $("#qOpts"); box.innerHTML = "";
+        q.choices.forEach((c, i) => {
+          const b = document.createElement("button"); b.className = "opt";
+          const k = document.createElement("span"); k.className = "key"; k.textContent = "ABCD"[i];
+          b.append(k, document.createTextNode(" " + c));
+          b.onclick = () => pick(i, b);
+          box.appendChild(b);
+        });
+      }
+
+      function pick(i, btn) {
+        if (answered) return;
+        answered = true;
+        const sub = bank()[subIdx];
+        const q = sub.questions[order[qi]];
+        const opts = $$("#qOpts .opt");
+        opts.forEach(o => o.disabled = true);
+        opts[q.correct].classList.add("correct");
+        if (i === q.correct) {
+          score++;
+          $("#qScore").textContent = `Score: ${score}`;
+          $("#qFeed").className = "feedback good"; $("#qFeed").textContent = "✓ Correct!";
+        } else {
+          btn.classList.add("wrong");
+          $("#qFeed").className = "feedback bad";
+          $("#qFeed").textContent = "✗ The correct answer is " + "ABCD"[q.correct] + ".";
+          missed.push({ q: q.q, yours: q.choices[i], right: q.choices[q.correct] });
+        }
+        $("#nextBtn").style.visibility = "visible";
+        $("#nextBtn").textContent = qi === order.length - 1 ? "See results →" : "Next →";
+        $("#nextBtn").focus();
+      }
+
+      $("#nextBtn").onclick = () => {
+        if (!answered) return;
+        if (qi === order.length - 1) { finish(); return; }
+        qi++; drawQ();
+      };
+      $("#quitBtn").onclick = () => { if (confirm("Quit this test? Progress won't be saved.")) go("home"); };
+
+      function finish() {
+        const sub = bank()[subIdx];
+        const total = order.length;
+        const pct = Math.round(score / total * 100);
+        const b = me().best[sub.name];
+        if (!b || pct > b.pct || (pct === b.pct && total > b.total)) {
+          me().best[sub.name] = { score, total, pct }; save();
+        }
+        $("#resEmoji").textContent = pct >= 90 ? "🏆" : pct >= 75 ? "🎉" : pct >= 50 ? "👍" : "📖";
+        $("#resScore").textContent = `${score} / ${total}`;
+        $("#resMsg").textContent = `${pct}% · ${cap(st.currentUser)} on ${sub.name} — ` +
+          (pct >= 90 ? "Amazing!" : pct >= 75 ? "Great job!" : pct >= 50 ? "Getting there, keep practicing!" : "Review the misses below and try again!");
+        const ml = $("#missedList"); ml.innerHTML = "";
+        if (missed.length) {
+          const h = document.createElement("h2"); h.textContent = "Review your " + missed.length + " missed item" + (missed.length === 1 ? "" : "s");
+          h.style.fontSize = "16px"; ml.appendChild(h);
+          missed.forEach(m => {
+            const d = document.createElement("div"); d.className = "miss";
+            const q = document.createElement("div"); q.className = "q"; q.textContent = m.q;
+            const y = document.createElement("div"); y.className = "yours"; y.textContent = "✗ Your answer: " + m.yours;
+            const r = document.createElement("div"); r.className = "right"; r.textContent = "✓ Correct: " + m.right;
+            d.append(q, y, r); ml.appendChild(d);
+          });
+        }
+        go("result");
+      }
+      $("#retryBtn").onclick = startTest;
+
+      /* ---------- keyboard ---------- */
+      document.addEventListener("keydown", e => {
+        if (!$("#scr-quiz").classList.contains("active")) return;
+        const k = e.key.toLowerCase();
+        const map = { a: 0, b: 1, c: 2, d: 3, "1": 0, "2": 1, "3": 2, "4": 3 };
+        if (k in map) {
+          const opts = $$("#qOpts .opt");
+          if (opts[map[k]] && !answered) opts[map[k]].click();
+        } else if (k === "enter" && answered) { $("#nextBtn").click(); }
+      });
+
+      /* ---------- init ---------- */
+      renderProfiles(); renderHome();
+    })();
+  </script>
 </body>
+
 </html>
